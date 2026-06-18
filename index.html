@@ -711,6 +711,10 @@ async function fetchMatches() {
     const data = await apiFetch('/competitions/' + CONFIG.COMPETITION + '/matches');
     const matches = data.matches || [];
     window._lastMatches = matches;
+    // Log all finished matches score structure
+    matches.filter(m=>m.status==='FINISHED').forEach(m=>{
+      console.log(m.homeTeam.name,'vs',m.awayTeam.name,'| ft:',JSON.stringify(m.score?.fullTime),'| status:',m.status);
+    });
     renderTicker(matches);
     renderToday(matches, cachedStandings);
     renderUpcoming(matches, cachedStandings);
