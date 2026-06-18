@@ -16,6 +16,12 @@
   --red:#f85149;--red-bg:rgba(248,81,73,0.1);
   --yellow:#d29922;--yellow-bg:rgba(210,153,34,0.1);
   --gold:#ffd700;
+  --live-bg:rgba(248,81,73,0.12);
+  --live-border:rgba(248,81,73,0.4);
+  --ft-bg:rgba(63,185,80,0.08);
+  --ft-border:rgba(63,185,80,0.25);
+  --upcoming-bg:rgba(88,166,255,0.06);
+  --upcoming-border:rgba(88,166,255,0.2);
   --font:'Inter',system-ui,sans-serif;
   --radius:10px;--radius-sm:6px;
 }
@@ -77,19 +83,27 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 
 /* MATCH ROWS */
 .match-day-hdr{padding:5px 14px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);background:var(--bg3);border-bottom:0.5px solid var(--border)}
-.match-row{padding:9px 14px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:10px;transition:background .1s;cursor:pointer;text-decoration:none;color:inherit}
+.match-row{padding:9px 14px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:10px;transition:background .1s;cursor:pointer;text-decoration:none;color:inherit;border-left:3px solid transparent}
 .match-row:last-child{border-bottom:none}
 .match-row:hover{background:var(--bg3)}
+.match-row.state-live{background:var(--live-bg);border-left-color:var(--red)}
+.match-row.state-ft{background:var(--ft-bg);border-left-color:var(--green)}
+.match-row.state-upcoming{background:var(--upcoming-bg);border-left-color:var(--blue)}
 .match-time{font-size:10px;font-weight:600;color:var(--blue);white-space:nowrap;width:48px;flex-shrink:0}
 .match-time.live{color:var(--red);animation:pulse 2s infinite}
-.match-time.ft{color:var(--text3);font-weight:400}
+.match-time.ft{color:var(--green);font-weight:500}
 .match-teams{flex:1;min-width:0}
 .match-team{font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .match-venue{font-size:9px;color:var(--text3);margin-top:2px}
-.match-score{font-size:16px;font-weight:700;color:var(--text);white-space:nowrap;min-width:44px;text-align:center}
+.match-score-wrap{display:flex;flex-direction:column;align-items:center;min-width:54px}
+.match-score{font-size:16px;font-weight:700;color:var(--text);white-space:nowrap;text-align:center;line-height:1}
 .match-score.live{color:var(--red)}
+.match-score.ft{color:var(--green)}
 .match-score.upcoming{font-size:11px;color:var(--text3)}
+.match-pts{font-size:9px;color:var(--text3);margin-top:3px;text-align:center;white-space:nowrap}
+.match-pts .pts-val{font-weight:600;color:var(--blue)}
 .fav-tag{font-size:9px;font-weight:600;padding:2px 6px;border-radius:99px;white-space:nowrap;flex-shrink:0;background:var(--green-bg);color:var(--green)}
+.score-label{font-size:8px;color:var(--text3);text-align:center;margin-top:2px;text-transform:uppercase;letter-spacing:.04em}
 
 /* STANDINGS */
 .grp-hdr{padding:6px 14px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--blue);background:var(--bg3);border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between}
@@ -458,42 +472,88 @@ function renderTicker(matches) {
 }
 
 // ── Render today's fixtures ────────────────────────────────────
-function renderToday(matches) {
+function matchCard(m, standings) {
+  const st = statusLabel(m.status);
+  const sc = scoreStr(m);
+
+  // Time label
+  let timeLabel, timeClass;
+  if (st === 'live') { timeLabel = '● LIVE'; timeClass = 'live'; }
+  else if (st === 'ft') { timeLabel = 'FT'; timeClass = 'ft'; }
+  else { timeLabel = fmtTime(m.utcDate); timeClass = ''; }
+
+  // Score / center display
+  let scoreHtml;
+  if (st === 'upcoming') {
+    // Show points for each team going into the match
+    const hPts = getTeamPoints(m.homeTeam.name, standings);
+    const aPts = getTeamPoints(m.awayTeam.name, standings);
+    const hStr = hPts !== null ? hPts + ' pts' : '—';
+    const aStr = aPts !== null ? aPts + ' pts' : '—';
+    scoreHtml = `<div class="match-score-wrap">
+      <div class="match-score upcoming">vs</div>
+      <div class="match-pts"><span class="pts-val">${hStr}</span> · <span class="pts-val">${aStr}</span></div>
+      <div class="score-label">current pts</div>
+    </div>`;
+  } else if (st === 'live') {
+    scoreHtml = `<div class="match-score-wrap">
+      <div class="match-score live">${sc}</div>
+      <div class="score-label">match score</div>
+    </div>`;
+  } else {
+    scoreHtml = `<div class="match-score-wrap">
+      <div class="match-score ft">${sc}</div>
+      <div class="score-label">final score</div>
+    </div>`;
+  }
+
+  return `<a class="match-row state-${st}" href="https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/scores-fixtures" target="_blank" rel="noopener">
+    <div class="match-time ${timeClass}">${timeLabel}</div>
+    <div class="match-teams">
+      <div class="match-team">${m.homeTeam.name} vs ${m.awayTeam.name}</div>
+      <div class="match-venue">${m.group||''}</div>
+    </div>
+    ${scoreHtml}
+  </a>`;
+}
+
+function getTeamPoints(teamName, standings) {
+  if (!standings || !standings.length) return null;
+  for (const grp of standings) {
+    for (const row of grp.table || []) {
+      if (row.team.name === teamName || row.team.shortName === teamName) {
+        return row.points;
+      }
+    }
+  }
+  return null;
+}
+
+function renderToday(matches, standings) {
   const todayM = matches.filter(m => isToday(m.utcDate));
   const badge = document.getElementById('today-badge');
   badge.textContent = todayM.length ? '● ' + todayM.length + ' matches' : 'No matches today';
 
-  if(!todayM.length) {
+  if (!todayM.length) {
     document.getElementById('today-matches').innerHTML =
       '<div class="loading-msg">No matches scheduled today</div>';
     return;
   }
 
-  const html = todayM.map(m => {
-    const st = statusLabel(m.status);
-    const sc = scoreStr(m);
-    const time = st === 'ft' ? 'FT' : st === 'live' ? '● LIVE' : fmtTime(m.utcDate);
-    return `<a class="match-row" href="https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/scores-fixtures" target="_blank" rel="noopener">
-      <div class="match-time ${st}">${time}</div>
-      <div class="match-teams">
-        <div class="match-team">${m.homeTeam.flag||''} ${m.homeTeam.name} vs ${m.awayTeam.name} ${m.awayTeam.flag||''}</div>
-        <div class="match-venue">${m.group||''}</div>
-      </div>
-      <div class="match-score ${st==='live'?'live':''} ${st==='upcoming'?'upcoming':''}">${st==='upcoming'?'vs':sc}</div>
-    </a>`;
-  }).join('');
-
-  document.getElementById('today-matches').innerHTML = html;
+  document.getElementById('today-matches').innerHTML =
+    todayM.map(m => matchCard(m, standings)).join('');
 }
 
-// ── Render upcoming ───────────────────────────────────────────
-function renderUpcoming(matches) {
+
+
+// ── Render upcoming ──────────────────────────────────────────
+function renderUpcoming(matches, standings) {
   const upcoming = matches
     .filter(m => m.status === 'TIMED' || m.status === 'SCHEDULED')
     .filter(m => !isToday(m.utcDate))
     .slice(0, 8);
 
-  if(!upcoming.length) {
+  if (!upcoming.length) {
     document.getElementById('upcoming-matches').innerHTML =
       '<div class="loading-msg">No upcoming fixtures found</div>';
     return;
@@ -504,18 +564,13 @@ function renderUpcoming(matches) {
     const d = fmtDate(m.utcDate);
     const hdr = d !== lastDate ? `<div class="match-day-hdr">${d}</div>` : '';
     lastDate = d;
-    return hdr + `<a class="match-row" href="https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/scores-fixtures" target="_blank" rel="noopener">
-      <div class="match-time">${fmtTime(m.utcDate)}</div>
-      <div class="match-teams">
-        <div class="match-team">${m.homeTeam.name} vs ${m.awayTeam.name}</div>
-        <div class="match-venue">${m.group||''}</div>
-      </div>
-      <div class="match-score upcoming">vs</div>
-    </a>`;
+    return hdr + matchCard(m, standings);
   }).join('');
 
   document.getElementById('upcoming-matches').innerHTML = html;
 }
+
+
 
 // ── Render odds panel ─────────────────────────────────────────
 function renderOdds(matches) {
@@ -617,14 +672,18 @@ function renderScorers(scorers) {
   if(avg) avg.textContent = '3.1';
 }
 
+// ── Cached standings for points display ─────────────────────
+let cachedStandings = [];
+
 // ── Main fetch ────────────────────────────────────────────────
 async function fetchMatches() {
   try {
     const data = await apiFetch('/competitions/' + CONFIG.COMPETITION + '/matches');
     const matches = data.matches || [];
+    window._lastMatches = matches;
     renderTicker(matches);
-    renderToday(matches);
-    renderUpcoming(matches);
+    renderToday(matches, cachedStandings);
+    renderUpcoming(matches, cachedStandings);
     renderOdds(matches);
 
     // update stats
@@ -651,7 +710,10 @@ async function fetchStandings() {
   try {
     const data = await apiFetch('/competitions/' + CONFIG.COMPETITION + '/standings');
     const groups = (data.standings||[]).filter(s=>s.type==='TOTAL');
+    cachedStandings = groups;
     renderStandings(groups);
+    // Re-render today with updated points
+    if (window._lastMatches) { renderToday(window._lastMatches, cachedStandings); renderUpcoming(window._lastMatches, cachedStandings); }
   } catch(e) {
     document.getElementById('standings-grid').innerHTML =
       '<div class="panel"><div class="error-msg">⚠ ' + e.message + '</div></div>';
