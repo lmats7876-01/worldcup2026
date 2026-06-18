@@ -410,34 +410,43 @@ function statusLabel(s) {
 }
 function scoreStr(m) {
   if (!m.score) return '—';
-  const st = m.status;
-  const ft = m.score.fullTime;
-  const ht = m.score.halfTime;
+  const st   = m.status;
+  const sc   = m.score;
 
-  // Always try fullTime first regardless of status
-  // (API sometimes lags on FINISHED status update)
-  if (ft && ft.home !== null && ft.away !== null && ft.home !== undefined) {
-    return ft.home + ' – ' + ft.away;
-  }
+  // Try every possible field name the API uses
+  const ft = sc.fullTime || sc.regularTime || sc.extraTime;
+  const ht = sc.halfTime;
 
-  // IN_PLAY or PAUSED with no fullTime — free tier limitation
-  if (st === 'IN_PLAY' || st === 'PAUSED') {
-    // Only show halftime if it's non-zero or second half is in play
-    if (ht && ht.home !== null && ht.away !== null && ht.home !== undefined
-        && st === 'PAUSED') {
-      return ht.home + ' – ' + ht.away + ' HT';
-    }
-    return 'Live';
-  }
+  // Helper: is a score object valid?
+  const valid = obj => obj && obj.home !== null && obj.home !== undefined
+                           && obj.away !== null && obj.away !== undefined;
 
-  // FINISHED but fullTime is null — show halftime as best available
-  // but label it clearly so it's not mistaken for final
+  // FINISHED — try fullTime first, then winner field as fallback
   if (st === 'FINISHED') {
+    if (valid(ft)) return ft.home + ' – ' + ft.away;
+    // Last resort: if API has winner but no score yet, show pending
     return 'Final pending';
   }
 
+  // PAUSED (halftime break)
+  if (st === 'PAUSED') {
+    if (valid(ht)) return ht.home + ' – ' + ht.away + ' HT';
+    return '0 – 0 HT';
+  }
+
+  // IN_PLAY — free tier doesn't give live scores
+  if (st === 'IN_PLAY') return 'Live';
+
   return '—';
 }
+
+// Debug helper — call refreshAll() then check window._matchDebug in console
+window._debugScore = function(teamName) {
+  const m = (window._lastMatches||[]).find(m =>
+    m.homeTeam.name.includes(teamName) || m.awayTeam.name.includes(teamName));
+  if (!m) return 'Match not found';
+  return { status: m.status, score: m.score, home: m.homeTeam.name, away: m.awayTeam.name };
+};
 
 // ── API fetch with rate-limit handling ─────────────────────────
 let lastFetch = 0;
