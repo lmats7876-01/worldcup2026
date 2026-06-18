@@ -173,6 +173,7 @@ const CONFIG = {
   BASE_URL: 'https://api.football-data.org/v4',
   COMPETITION: 'WC',
   REFRESH_INTERVAL: 60000,
+  NEWS_API_KEY: '3b4f9d5c96744c47b405ffa7be8af8ac',
 };
 </script>
 
@@ -380,15 +381,11 @@ const CONFIG = {
 <div class="tab-section" id="tab-news">
   <div class="grid2">
     <div class="panel">
-      <div class="ph"><div class="ph-title">🔥 Top stories</div></div>
-      <a class="news-row" href="https://www.espn.com/soccer/story/_/id/48939282/2026-fifa-world-cup-fixtures-results-match-schedule-group-stage-knockout-rounds-bracket" target="_blank" rel="noopener"><div class="news-flag">🇦🇷</div><div><div class="news-hl">Messi hat trick ties Klose's all-time World Cup record with 16 goals in Argentina 3–0 Algeria rout</div><div class="news-meta"><span class="news-src">ESPN</span><span>· 1d ago</span></div></div></a>
-      <a class="news-row" href="https://sports.yahoo.com/soccer/article/2026-world-cup-results-and-schedule-live-scores-group-stage-updates-and-how-to-watch-050724193.html" target="_blank" rel="noopener"><div class="news-flag">🏴󠁧󠁢󠁥󠁮󠁧󠁿</div><div><div class="news-hl">Kane double and Bellingham masterclass power England to 4–2 win over Croatia in Dallas</div><div class="news-meta"><span class="news-src">Yahoo Sports</span><span>· 12h ago</span></div></div></a>
-      <a class="news-row" href="https://bleacherreport.com/articles/25441482-world-cup-2026-group-standings-schedule-after-tuesdays-results-ahead-ko-bracket" target="_blank" rel="noopener"><div class="news-flag">🇪🇸</div><div><div class="news-hl">Spain held to 0–0 shock draw by Cape Verde — goalkeeper Vozinha goes viral with 2M new followers</div><div class="news-meta"><span class="news-src">Bleacher Report</span><span>· 3d ago</span></div></div></a>
-      <a class="news-row" href="https://sports.yahoo.com/soccer/article/2026-world-cup-results-and-schedule-live-scores-group-stage-updates-and-how-to-watch-050724193.html" target="_blank" rel="noopener"><div class="news-flag">🇺🇸</div><div><div class="news-hl">USA 4–1 Paraguay: Balogun and Pulisic star as USMNT open with statement win at SoFi Stadium</div><div class="news-meta"><span class="news-src">Yahoo Sports</span><span>· 6d ago</span></div></div></a>
-      <a class="news-row" href="https://www.fourfourtwo.com/competition/all-of-the-world-cup-scores-so-far-at-the-2026-tournament" target="_blank" rel="noopener"><div class="news-flag">🇳🇴</div><div><div class="news-hl">Haaland finally scores World Cup goal — double vs Iraq as Norway announce dark horse credentials</div><div class="news-meta"><span class="news-src">FourFourTwo</span><span>· 6d ago</span></div></div></a>
-      <a class="news-row" href="https://www.fourfourtwo.com/competition/all-of-the-world-cup-scores-so-far-at-the-2026-tournament" target="_blank" rel="noopener"><div class="news-flag">🇩🇪</div><div><div class="news-hl">Germany 4–0 Saudi Arabia: Ruthless performance signals Die Mannschaft are serious title contenders</div><div class="news-meta"><span class="news-src">FourFourTwo</span><span>· 4d ago</span></div></div></a>
-      <a class="news-row" href="https://sports.yahoo.com/soccer/article/2026-world-cup-results-and-schedule-live-scores-group-stage-updates-and-how-to-watch-050724193.html" target="_blank" rel="noopener"><div class="news-flag">🇧🇷</div><div><div class="news-hl">Brazil held to 1–1 draw by Morocco — Vinícius Jr rescues Seleção but questions remain</div><div class="news-meta"><span class="news-src">Yahoo Sports</span><span>· 5d ago</span></div></div></a>
-      <a class="news-row" href="https://www.nbcsports.com/soccer/news/2026-world-cup-group-stage-table-full-standings-for-all-12-groups" target="_blank" rel="noopener"><div class="news-flag">🏴󠁧󠁢󠁳󠁣󠁴󠁿</div><div><div class="news-hl">Scotland end 28-year World Cup drought with opening win over Haiti — Gilmour scores key goal</div><div class="news-meta"><span class="news-src">NBC Sports</span><span>· 5d ago</span></div></div></a>
+      <div class="ph">
+        <div class="ph-title">🔥 Top stories</div>
+        <span class="ph-badge badge-blue" id="news-tab-badge">Live</span>
+      </div>
+      <div id="news-tab-body"><div class="loading-msg"><div class="spinner-wrap"><div class="spinner"></div>Loading news…</div></div></div>
     </div>
     <div class="panel">
       <div class="ph"><div class="ph-title">🔗 Live coverage</div></div>
@@ -886,6 +883,64 @@ function renderScorers(scorers) {
 // ── Cached standings for points display ─────────────────────
 let cachedStandings = [];
 
+
+// ── Fetch live news from NewsAPI ──────────────────────────────
+async function fetchNews() {
+  try {
+    const query = encodeURIComponent('FIFA World Cup 2026');
+    const url = `https://newsapi.org/v2/everything?q=${query}&sortBy=publishedAt&language=en&pageSize=12&apiKey=${CONFIG.NEWS_API_KEY}`;
+    // NewsAPI blocks direct browser requests on free tier — use proxy
+    const proxied = 'https://corsproxy.io/?' + encodeURIComponent(url);
+
+    let res = await fetch(proxied);
+    if (!res.ok) {
+      // fallback proxy
+      res = await fetch('https://proxy.cors.sh/' + url);
+    }
+    if (!res.ok) throw new Error('News fetch failed');
+
+    const data = await res.json();
+    const articles = (data.articles || []).filter(a => a.title && a.url && !a.title.includes('[Removed]'));
+
+    renderNews(articles);
+  } catch(e) {
+    const msg = `<div class="empty-state">Could not load news — ${e.message}</div>`;
+    const b1 = document.getElementById('today-news-body');
+    const b2 = document.getElementById('news-tab-body');
+    if(b1) b1.innerHTML = msg;
+    if(b2) b2.innerHTML = msg;
+  }
+}
+
+function renderNews(articles) {
+  if (!articles.length) return;
+
+  const badge1 = document.getElementById('news-badge');
+  const badge2 = document.getElementById('news-tab-badge');
+  if(badge1) badge1.textContent = articles.length + ' articles';
+  if(badge2) badge2.textContent = articles.length + ' articles';
+
+  const html = articles.map(a => {
+    const src  = a.source?.name || 'News';
+    const ago  = timeAgo(new Date(a.publishedAt).getTime());
+    const img  = a.urlToImage
+      ? `<img src="${a.urlToImage}" style="width:44px;height:44px;border-radius:var(--radius-sm);object-fit:cover;flex-shrink:0" onerror="this.style.display='none'">`
+      : `<div style="width:44px;height:44px;border-radius:var(--radius-sm);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">⚽</div>`;
+    return `<a class="news-row" href="${a.url}" target="_blank" rel="noopener">
+      ${img}
+      <div style="flex:1;min-width:0">
+        <div class="news-hl">${a.title}</div>
+        <div class="news-meta"><span class="news-src">${src}</span><span>· ${ago}</span></div>
+      </div>
+    </a>`;
+  }).join('');
+
+  const b1 = document.getElementById('today-news-body');
+  const b2 = document.getElementById('news-tab-body');
+  if(b1) b1.innerHTML = html;
+  if(b2) b2.innerHTML = html;
+}
+
 // ── Main fetch ────────────────────────────────────────────────
 async function fetchMatches() {
   try {
@@ -947,6 +1002,7 @@ async function refreshAll() {
   await fetchMatches();
   await fetchStandings();
   await fetchScorers();
+  await fetchNews();
 }
 
 // ── Tab switching ─────────────────────────────────────────────
@@ -971,6 +1027,7 @@ setInterval(() => {
 
 // ── Init ──────────────────────────────────────────────────────
 refreshAll();
+fetchNews();
 </script>
 </body>
 </html>
