@@ -518,16 +518,10 @@ async function apiFetch(endpoint) {
   if(wait > 0) await new Promise(r => setTimeout(r, wait));
   lastFetch = Date.now();
 
-  const sep = endpoint.includes('?') ? '&' : '?';
-  const apiUrl = CONFIG.BASE_URL + endpoint + sep + 'token=' + CONFIG.API_KEY;
-  const res = await fetch(apiUrl);
-
-  // Check rate limit headers
-  const remaining = res.headers.get('X-Requests-Available-Minute');
-  if(remaining !== null && parseInt(remaining) < 3) {
-    console.warn('Rate limit low — slowing down. Remaining:', remaining);
-    await new Promise(r => setTimeout(r, 10000));
-  }
+  const url = 'https://thingproxy.freeboard.io/fetch/' + CONFIG.BASE_URL + endpoint;
+  const res = await fetch(url, {
+    headers: { 'X-Auth-Token': CONFIG.API_KEY }
+  });
 
   if(res.status === 429) throw new Error('Rate limit hit — try again in a minute');
   if(!res.ok) throw new Error('API error ' + res.status);
