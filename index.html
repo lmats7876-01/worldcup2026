@@ -518,11 +518,10 @@ async function apiFetch(endpoint) {
   if(wait > 0) await new Promise(r => setTimeout(r, wait));
   lastFetch = Date.now();
 
-  const encodedUrl = encodeURIComponent(CONFIG.BASE_URL + endpoint);
-  const PROXY = 'https://api.allorigins.win/get?url=' + encodedUrl;
-  const res = await fetch(PROXY, {
-    headers: { 'X-Auth-Token': CONFIG.API_KEY }
-  });
+  const sep = endpoint.includes('?') ? '&' : '?';
+  const apiUrl = CONFIG.BASE_URL + endpoint + sep + 'X-Auth-Token=' + CONFIG.API_KEY;
+  const PROXY = 'https://api.allorigins.win/get?url=' + encodeURIComponent(apiUrl);
+  const res = await fetch(PROXY);
 
   // Check rate limit headers
   const remaining = res.headers.get('X-Requests-Available-Minute');
