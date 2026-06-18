@@ -518,14 +518,32 @@ async function apiFetch(endpoint) {
   if(wait > 0) await new Promise(r => setTimeout(r, wait));
   lastFetch = Date.now();
 
-  const url = 'https://thingproxy.freeboard.io/fetch/' + CONFIG.BASE_URL + endpoint;
-  const res = await fetch(url, {
-    headers: { 'X-Auth-Token': CONFIG.API_KEY }
-  });
+  // Try proxies in order until one works
+  const target = CONFIG.BASE_URL + endpoint;
+  const proxies = [
+    'https://corsproxy.io/?' + encodeURIComponent(target),
+    'https://proxy.cors.sh/' + target,
+    'https://cors-anywhere.herokuapp.com/' + target,
+  ];
 
-  if(res.status === 429) throw new Error('Rate limit hit — try again in a minute');
-  if(!res.ok) throw new Error('API error ' + res.status);
-  return res.json();
+  let lastErr;
+  for (const url of proxies) {
+    try {
+      const res = await fetch(url, {
+        headers: {
+          'X-Auth-Token': CONFIG.API_KEY,
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      });
+      if (res.status === 429) throw new Error('Rate limit hit');
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return await res.json();
+    } catch(e) {
+      console.warn('Proxy failed:', url, e.message);
+      lastErr = e;
+    }
+  }
+  throw new Error('All proxies failed: ' + lastErr.message);
 }
 
 // ── Render ticker ──────────────────────────────────────────────
