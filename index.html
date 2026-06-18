@@ -519,9 +519,8 @@ async function apiFetch(endpoint) {
   lastFetch = Date.now();
 
   const sep = endpoint.includes('?') ? '&' : '?';
-  const apiUrl = CONFIG.BASE_URL + endpoint + sep + 'X-Auth-Token=' + CONFIG.API_KEY;
-  const PROXY = 'https://api.allorigins.win/get?url=' + encodeURIComponent(apiUrl);
-  const res = await fetch(PROXY);
+  const apiUrl = CONFIG.BASE_URL + endpoint + sep + 'token=' + CONFIG.API_KEY;
+  const res = await fetch(apiUrl);
 
   // Check rate limit headers
   const remaining = res.headers.get('X-Requests-Available-Minute');
@@ -532,10 +531,7 @@ async function apiFetch(endpoint) {
 
   if(res.status === 429) throw new Error('Rate limit hit — try again in a minute');
   if(!res.ok) throw new Error('API error ' + res.status);
-  const wrapper = await res.json();
-  // allorigins wraps response in {contents: "...json string..."}
-  if(wrapper.contents) return JSON.parse(wrapper.contents);
-  return wrapper;
+  return res.json();
 }
 
 // ── Render ticker ──────────────────────────────────────────────
