@@ -404,24 +404,30 @@ function isToday(utc) {
   return d.getFullYear()===t.getFullYear() && d.getMonth()===t.getMonth() && d.getDate()===t.getDate();
 }
 function statusLabel(s) {
-  if(s==='IN_PLAY'||s==='PAUSED') return 'live';
-  if(s==='FINISHED') return 'ft';
+  if (s === 'IN_PLAY' || s === 'PAUSED') return 'live';
+  if (s === 'FINISHED') return 'ft';
   return 'upcoming';
 }
 function scoreStr(m) {
-  if(!m.score||!m.score.fullTime) {
-    console.warn('No score data for:', m.homeTeam.name, 'vs', m.awayTeam.name, '| status:', m.status, '| score obj:', JSON.stringify(m.score));
+  if (!m.score) return '—';
+  const st = m.status;
+
+  // FINISHED — use fullTime score
+  if (st === 'FINISHED') {
+    const h = m.score.fullTime?.home, a = m.score.fullTime?.away;
+    if (h !== null && a !== null && h !== undefined) return h + ' – ' + a;
     return '—';
   }
-  const h = m.score.fullTime.home, a = m.score.fullTime.away;
-  if(h===null||a===null) {
-    console.warn('Null score for:', m.homeTeam.name, 'vs', m.awayTeam.name, '| status:', m.status, '| fullTime:', JSON.stringify(m.score.fullTime), '| halfTime:', JSON.stringify(m.score.halfTime));
+
+  // IN_PLAY or PAUSED — free tier returns null live scores
+  // Show halftime score if available, otherwise show "Live"
+  if (st === 'IN_PLAY' || st === 'PAUSED') {
     const ih = m.score.halfTime?.home, ia = m.score.halfTime?.away;
-    if(ih!==null&&ia!==null&&ih!==undefined) return ih+' – '+ia+' HT';
-    return '— vs —';
+    if (ih !== null && ia !== null && ih !== undefined) return ih + ' – ' + ia + ' ½';
+    return 'Live';
   }
-  console.log('Score OK:', m.homeTeam.name, h, '–', a, m.awayTeam.name, '| status:', m.status);
-  return h+' – '+a;
+
+  return '—';
 }
 
 // ── API fetch with rate-limit handling ─────────────────────────
@@ -501,9 +507,10 @@ function matchCard(m, standings) {
       <div class="score-label">current pts</div>
     </div>`;
   } else if (st === 'live') {
+    const liveNote = sc === 'Live' ? 'in progress' : 'halftime';
     scoreHtml = `<div class="match-score-wrap">
       <div class="match-score live">${sc}</div>
-      <div class="score-label">match score</div>
+      <div class="score-label">${liveNote}</div>
     </div>`;
   } else {
     scoreHtml = `<div class="match-score-wrap">
@@ -686,9 +693,6 @@ async function fetchMatches() {
     const data = await apiFetch('/competitions/' + CONFIG.COMPETITION + '/matches');
     const matches = data.matches || [];
     window._lastMatches = matches;
-    // Debug: log Switzerland match specifically
-    const sui = matches.find(m => m.homeTeam.name.includes('Switzerland') || m.awayTeam.name.includes('Switzerland'));
-    if(sui) console.log('Switzerland match raw:', JSON.stringify({status:sui.status, score:sui.score, home:sui.homeTeam.name, away:sui.awayTeam.name}));
     renderTicker(matches);
     renderToday(matches, cachedStandings);
     renderUpcoming(matches, cachedStandings);
