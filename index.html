@@ -400,8 +400,19 @@ function fmtDate(utc) {
   return new Date(utc).toLocaleDateString('en-US',{month:'short',day:'numeric'});
 }
 function isToday(utc) {
-  const d = new Date(utc), t = new Date();
-  return d.getFullYear()===t.getFullYear() && d.getMonth()===t.getMonth() && d.getDate()===t.getDate();
+  // Compare in local timezone
+  const d = new Date(utc);
+  const t = new Date();
+  return d.getFullYear()===t.getFullYear() &&
+         d.getMonth()===t.getMonth() &&
+         d.getDate()===t.getDate();
+}
+function isTodayOrRecent(utc) {
+  // Include matches from last 24h in case of timezone edge cases
+  const d = new Date(utc);
+  const now = new Date();
+  const diffHours = (now - d) / 3600000;
+  return isToday(utc) || (diffHours > 0 && diffHours < 24);
 }
 function statusLabel(s) {
   if (s === 'IN_PLAY' || s === 'PAUSED') return 'live';
@@ -440,13 +451,6 @@ function scoreStr(m) {
   return '—';
 }
 
-// Debug helper — call refreshAll() then check window._matchDebug in console
-window._debugScore = function(teamName) {
-  const m = (window._lastMatches||[]).find(m =>
-    m.homeTeam.name.includes(teamName) || m.awayTeam.name.includes(teamName));
-  if (!m) return 'Match not found';
-  return { status: m.status, score: m.score, home: m.homeTeam.name, away: m.awayTeam.name };
-};
 
 // ── API fetch with rate-limit handling ─────────────────────────
 let lastFetch = 0;
@@ -560,7 +564,7 @@ function getTeamPoints(teamName, standings) {
 }
 
 function renderToday(matches, standings) {
-  const todayM = matches.filter(m => isToday(m.utcDate));
+  const todayM = matches.filter(m => isTodayOrRecent(m.utcDate));
   const badge = document.getElementById('today-badge');
   badge.textContent = todayM.length ? '● ' + todayM.length + ' matches' : 'No matches today';
 
@@ -711,10 +715,6 @@ async function fetchMatches() {
     const data = await apiFetch('/competitions/' + CONFIG.COMPETITION + '/matches');
     const matches = data.matches || [];
     window._lastMatches = matches;
-    // Log all finished matches score structure
-    matches.filter(m=>m.status==='FINISHED').forEach(m=>{
-      console.log(m.homeTeam.name,'vs',m.awayTeam.name,'| ft:',JSON.stringify(m.score?.fullTime),'| status:',m.status);
-    });
     renderTicker(matches);
     renderToday(matches, cachedStandings);
     renderUpcoming(matches, cachedStandings);
