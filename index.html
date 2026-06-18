@@ -411,20 +411,29 @@ function statusLabel(s) {
 function scoreStr(m) {
   if (!m.score) return '—';
   const st = m.status;
+  const ft = m.score.fullTime;
+  const ht = m.score.halfTime;
 
-  // FINISHED — use fullTime score
-  if (st === 'FINISHED') {
-    const h = m.score.fullTime?.home, a = m.score.fullTime?.away;
-    if (h !== null && a !== null && h !== undefined) return h + ' – ' + a;
-    return '—';
+  // Always try fullTime first regardless of status
+  // (API sometimes lags on FINISHED status update)
+  if (ft && ft.home !== null && ft.away !== null && ft.home !== undefined) {
+    return ft.home + ' – ' + ft.away;
   }
 
-  // IN_PLAY or PAUSED — free tier returns null live scores
-  // Show halftime score if available, otherwise show "Live"
+  // IN_PLAY or PAUSED with no fullTime — free tier limitation
   if (st === 'IN_PLAY' || st === 'PAUSED') {
-    const ih = m.score.halfTime?.home, ia = m.score.halfTime?.away;
-    if (ih !== null && ia !== null && ih !== undefined) return ih + ' – ' + ia + ' ½';
+    // Only show halftime if it's non-zero or second half is in play
+    if (ht && ht.home !== null && ht.away !== null && ht.home !== undefined
+        && st === 'PAUSED') {
+      return ht.home + ' – ' + ht.away + ' HT';
+    }
     return 'Live';
+  }
+
+  // FINISHED but fullTime is null — show halftime as best available
+  // but label it clearly so it's not mistaken for final
+  if (st === 'FINISHED') {
+    return 'Final pending';
   }
 
   return '—';
