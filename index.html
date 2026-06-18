@@ -223,7 +223,14 @@ const CONFIG = {
           <div class="ph-title">📅 Today's fixtures</div>
           <span class="ph-badge badge-live" id="today-badge">Loading…</span>
         </div>
-        <div id="today-matches"><div class="loading-msg"><div class="spinner-wrap"><div class="spinner"></div>Loading fixtures…</div></div></div>
+        <div style="padding:8px 14px;background:rgba(210,153,34,0.1);border-bottom:0.5px solid rgba(210,153,34,0.3);display:flex;align-items:flex-start;gap:8px">
+  <span style="font-size:14px;flex-shrink:0">⚠️</span>
+  <div style="font-size:10px;color:var(--yellow);line-height:1.6">
+    <strong style="font-weight:600">Scores may be delayed</strong> — live data from football-data.org can lag 15–60 min after a match ends.
+    Click any match row to view the live score on FIFA.com.
+  </div>
+</div>
+<div id="today-matches"><div class="loading-msg"><div class="spinner-wrap"><div class="spinner"></div>Loading fixtures…</div></div></div>
       </div>
     </div>
     <div class="col">
@@ -243,6 +250,24 @@ const CONFIG = {
         <a class="news-row" href="https://www.fourfourtwo.com/competition/all-of-the-world-cup-scores-so-far-at-the-2026-tournament" target="_blank" rel="noopener"><div class="news-flag">🇩🇪</div><div><div class="news-hl">Germany 4–0 Saudi Arabia: Ruthless display signals Die Mannschaft are back</div><div class="news-meta"><span class="news-src">FourFourTwo</span><span>· 4d ago</span></div></div></a>
         <a class="news-row" href="https://sports.yahoo.com/soccer/article/2026-world-cup-results-and-schedule-live-scores-group-stage-updates-and-how-to-watch-050724193.html" target="_blank" rel="noopener"><div class="news-flag">🇧🇷</div><div><div class="news-hl">Brazil held 1–1 by Morocco — Vinícius Jr bails out Seleção</div><div class="news-meta"><span class="news-src">Yahoo Sports</span><span>· 5d ago</span></div></div></a>
       </div>
+    </div>
+  </div>
+
+  <!-- COMPACT BRACKET -->
+  <div class="panel bracket-wrap" style="margin-top:14px">
+    <div class="bracket-title">
+      <span>📊 All group standings</span>
+      <span class="ph-badge badge-blue" id="bracket-md">Live from API</span>
+    </div>
+    <div class="bracket-grid" id="bracket-grid">
+      <div style="grid-column:1/-1;padding:20px;text-align:center;color:var(--text3);font-size:12px">
+        <div class="spinner-wrap"><div class="spinner"></div>Loading standings…</div>
+      </div>
+    </div>
+    <div class="bracket-legend">
+      <div class="bl"><div class="bl-line" style="background:var(--blue)"></div>Auto qualify (top 2)</div>
+      <div class="bl"><div class="bl-line" style="background:var(--green)"></div>Likely qualify</div>
+      <div class="bl"><div class="bl-line" style="background:var(--yellow)"></div>Bubble (best 3rd)</div>
     </div>
   </div>
 </div>
@@ -636,6 +661,42 @@ function renderOdds(matches) {
   document.getElementById('today-odds').innerHTML = html;
 }
 
+
+// ── Render compact bracket in Today tab ──────────────────────
+function renderBracket(groups) {
+  const grid = document.getElementById('bracket-grid');
+  if (!grid || !groups || !groups.length) return;
+
+  grid.innerHTML = groups.map(grp => {
+    const name = grp.group || 'Group';
+    const rows = grp.table.map((t, i) => {
+      const cls = i === 0 ? 'q1' : i === 1 ? 'q2' : i === 2 ? 'q3' : '';
+      // Shorten team name to fit
+      const short = t.team.shortName || t.team.tla || t.team.name.split(' ')[0];
+      return `<div class="bracket-team ${cls}">
+        <span class="bt-name">${short}</span>
+        <span class="bt-played">${t.playedGames}G</span>
+        <span class="bt-pts">${t.points}pts</span>
+      </div>`;
+    }).join('');
+
+    return `<div class="bracket-group">
+      <div class="bracket-group-hdr">
+        <span>${name}</span>
+        <span style="color:var(--text3)">${grp.table[0]?.playedGames||0}/3</span>
+      </div>
+      ${rows}
+    </div>`;
+  }).join('');
+
+  // Update badge
+  const badge = document.getElementById('bracket-md');
+  if (badge) {
+    const played = groups[0]?.table[0]?.playedGames || 0;
+    badge.textContent = 'Matchday ' + played + ' of 3';
+  }
+}
+
 // ── Render standings ──────────────────────────────────────────
 function renderStandings(groups) {
   if(!groups||!groups.length) {
@@ -746,6 +807,7 @@ async function fetchStandings() {
     const groups = (data.standings||[]).filter(s=>s.type==='TOTAL');
     cachedStandings = groups;
     renderStandings(groups);
+    renderBracket(groups);
     // Re-render today with updated points
     if (window._lastMatches) { renderToday(window._lastMatches, cachedStandings); renderUpcoming(window._lastMatches, cachedStandings); }
   } catch(e) {
