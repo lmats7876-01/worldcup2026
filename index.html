@@ -409,13 +409,18 @@ function statusLabel(s) {
   return 'upcoming';
 }
 function scoreStr(m) {
-  if(!m.score||!m.score.fullTime) return '—';
+  if(!m.score||!m.score.fullTime) {
+    console.warn('No score data for:', m.homeTeam.name, 'vs', m.awayTeam.name, '| status:', m.status, '| score obj:', JSON.stringify(m.score));
+    return '—';
+  }
   const h = m.score.fullTime.home, a = m.score.fullTime.away;
   if(h===null||a===null) {
+    console.warn('Null score for:', m.homeTeam.name, 'vs', m.awayTeam.name, '| status:', m.status, '| fullTime:', JSON.stringify(m.score.fullTime), '| halfTime:', JSON.stringify(m.score.halfTime));
     const ih = m.score.halfTime?.home, ia = m.score.halfTime?.away;
     if(ih!==null&&ia!==null&&ih!==undefined) return ih+' – '+ia+' HT';
     return '— vs —';
   }
+  console.log('Score OK:', m.homeTeam.name, h, '–', a, m.awayTeam.name, '| status:', m.status);
   return h+' – '+a;
 }
 
@@ -681,6 +686,9 @@ async function fetchMatches() {
     const data = await apiFetch('/competitions/' + CONFIG.COMPETITION + '/matches');
     const matches = data.matches || [];
     window._lastMatches = matches;
+    // Debug: log Switzerland match specifically
+    const sui = matches.find(m => m.homeTeam.name.includes('Switzerland') || m.awayTeam.name.includes('Switzerland'));
+    if(sui) console.log('Switzerland match raw:', JSON.stringify({status:sui.status, score:sui.score, home:sui.homeTeam.name, away:sui.awayTeam.name}));
     renderTicker(matches);
     renderToday(matches, cachedStandings);
     renderUpcoming(matches, cachedStandings);
