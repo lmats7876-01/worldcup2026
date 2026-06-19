@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Pull latest data.json
-        run: git pull origin main
+        run: git pull --rebase origin main
 
       - name: Fetch scores and standings
         env:
