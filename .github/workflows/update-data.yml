@@ -22,6 +22,9 @@ jobs:
           curl -s -H "X-Auth-Token: $FOOTBALL_KEY" "https://api.football-data.org/v4/competitions/WC/standings" -o standings_raw.json
           curl -s -H "X-Auth-Token: $FOOTBALL_KEY" "https://api.football-data.org/v4/competitions/WC/scorers?limit=15" -o scorers_raw.json
 
+      - name: Pull latest data.json
+        run: git pull origin main
+
       - name: Build data.json
         uses: actions/github-script@v7
         with:
