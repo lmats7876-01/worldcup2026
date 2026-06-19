@@ -164,6 +164,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 @media(max-width:1000px){.grid3{grid-template-columns:1fr 1fr}.grid4{grid-template-columns:1fr 1fr}}
 @media(max-width:680px){.grid3,.grid2,.grid4{grid-template-columns:1fr}.main{padding:12px 12px 40px}}
 </style>
+<!-- Data snapshot injected by GitHub Action — loads instantly with no network request -->
+<script>window.WC_SNAPSHOT = null;</script>
 </head>
 <body>
 
@@ -501,10 +503,10 @@ function scoreStr(m) {
 
 
 // ── API fetch with rate-limit handling ─────────────────────────
-// ── Load data.json — instant from cache, then refresh in background ──
+// ── Load data — use embedded snapshot first (instant), then fetch fresh ──
 async function loadData(bustCache) {
-  const url = bustCache ? './data.json?t=' + Date.now() : './data.json';
-  const res = await fetch(url);
+  if (!bustCache && window.WC_SNAPSHOT) return window.WC_SNAPSHOT;
+  const res = await fetch('./data.json?t=' + Date.now());
   if (!res.ok) throw new Error('Could not load data.json');
   return res.json();
 }
@@ -1032,10 +1034,10 @@ setInterval(() => {
 }, 1000);
 
 // ── Init ──────────────────────────────────────────────────────
-// Phase 1: Load instantly from browser cache (no cache-busting)
+// Phase 1: Render instantly from embedded snapshot (zero network requests)
 fetchAll(false);
-// Phase 2: After 2s, silently fetch fresh data in background
-setTimeout(() => fetchAll(true), 2000);
+// Phase 2: After 3s silently check for newer data.json in background
+setTimeout(() => fetchAll(true), 3000);
 </script>
 </body>
 </html>
