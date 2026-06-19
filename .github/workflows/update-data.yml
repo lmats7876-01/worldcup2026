@@ -19,43 +19,11 @@ jobs:
           FOOTBALL_KEY: ${{ secrets.FOOTBALL_API_KEY }}
           NEWS_KEY: ${{ secrets.NEWS_API_KEY }}
         run: |
-          curl -s -H "X-Auth-Token: $FOOTBALL_KEY" \
-            "https://api.football-data.org/v4/competitions/WC/matches" \
-            -o matches.json
-
-          curl -s -H "X-Auth-Token: $FOOTBALL_KEY" \
-            "https://api.football-data.org/v4/competitions/WC/standings" \
-            -o standings.json
-
-          curl -s -H "X-Auth-Token: $FOOTBALL_KEY" \
-            "https://api.football-data.org/v4/competitions/WC/scorers?limit=15" \
-            -o scorers.json
-
-          curl -s "https://gnews.io/api/v4/search?q=%22World+Cup+2026%22&lang=en&max=12&sortby=publishedAt&token=$NEWS_KEY" \
-            -o news.json
-
-          python3 - << 'PYEOF'
-import json
-from datetime import datetime, timezone
-
-with open('matches.json')   as f: matches   = json.load(f)
-with open('standings.json') as f: standings = json.load(f)
-with open('scorers.json')   as f: scorers   = json.load(f)
-with open('news.json')      as f: news      = json.load(f)
-
-out = {
-  'updated':   datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
-  'matches':   matches,
-  'standings': standings,
-  'scorers':   scorers,
-  'news':      news
-}
-
-with open('data.json', 'w') as f:
-  json.dump(out, f)
-
-print('Written:', len(matches.get('matches',[])), 'matches,', len(news.get('articles',[])), 'articles')
-PYEOF
+          curl -s -H "X-Auth-Token: $FOOTBALL_KEY" "https://api.football-data.org/v4/competitions/WC/matches" -o matches.json
+          curl -s -H "X-Auth-Token: $FOOTBALL_KEY" "https://api.football-data.org/v4/competitions/WC/standings" -o standings.json
+          curl -s -H "X-Auth-Token: $FOOTBALL_KEY" "https://api.football-data.org/v4/competitions/WC/scorers?limit=15" -o scorers.json
+          curl -s "https://gnews.io/api/v4/search?q=%22World+Cup+2026%22&lang=en&max=12&sortby=publishedAt&token=$NEWS_KEY" -o news.json
+          python3 merge.py
 
       - name: Commit
         run: |
