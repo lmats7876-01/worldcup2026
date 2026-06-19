@@ -32,7 +32,7 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const exec = require('util').promisify(require('child_process').exec);
+            const execCmd = require('util').promisify(require('child_process').exec);
 
             const raw = JSON.parse(fs.readFileSync('matches_raw.json', 'utf8'));
             const finished = (raw.matches || [])
@@ -43,7 +43,7 @@ jobs:
             const details = [];
             for (const m of finished) {
               try {
-                const { stdout } = await exec(
+                const { stdout } = await execCmd(
                   `curl -s -H "X-Auth-Token: ${process.env.FOOTBALL_KEY}" "https://api.football-data.org/v4/matches/${m.id}"`
                 );
                 const detail = JSON.parse(stdout);
