@@ -24,17 +24,17 @@ jobs:
           curl -s -H "X-Auth-Token: $FOOTBALL_KEY" "https://api.football-data.org/v4/competitions/WC/scorers?limit=15" -o scorers_raw.json
           curl -s "https://gnews.io/api/v4/search?q=%22World+Cup+2026%22&lang=en&max=12&sortby=publishedAt&token=$NEWS_KEY" -o news_raw.json
 
-      - name: Slim and merge into data.json
+      - name: Build index.html with embedded data
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
+
             const raw_m  = JSON.parse(fs.readFileSync('matches_raw.json',   'utf8'));
             const raw_st = JSON.parse(fs.readFileSync('standings_raw.json', 'utf8'));
             const raw_sc = JSON.parse(fs.readFileSync('scorers_raw.json',   'utf8'));
             const raw_n  = JSON.parse(fs.readFileSync('news_raw.json',      'utf8'));
 
-            // Slim matches — only keep fields the dashboard uses
             const matches = (raw_m.matches || []).map(m => ({
               utcDate:  m.utcDate,
               status:   m.status,
@@ -45,7 +45,6 @@ jobs:
               score:    m.score
             }));
 
-            // Slim standings — only keep fields the dashboard uses
             const standings = (raw_st.standings || [])
               .filter(s => s.type === 'TOTAL')
               .map(s => ({
@@ -58,20 +57,16 @@ jobs:
                   won:         t.won,
                   draw:        t.draw,
                   lost:        t.lost,
-                  goalsFor:    t.goalsFor,
-                  goalsAgainst:t.goalsAgainst,
                   team: { name: t.team.name, shortName: t.team.shortName, tla: t.team.tla }
                 }))
               }));
 
-            // Slim scorers
             const scorers = (raw_sc.scorers || []).map(s => ({
               goals:  s.goals,
               player: { name: s.player.name },
               team:   { name: s.team.name, shortName: s.team.shortName }
             }));
 
-            // Slim news
             const articles = (raw_n.articles || []).map(a => ({
               title:       a.title,
               url:         a.url,
@@ -80,7 +75,7 @@ jobs:
               source:      a.source?.name || a.source || ''
             }));
 
-            const out = {
+            const data = {
               updated:   new Date().toISOString(),
               matches,
               standings,
@@ -88,15 +83,22 @@ jobs:
               articles
             };
 
-            const json = JSON.stringify(out);
-            fs.writeFileSync('data.json', json);
-            console.log('data.json:', Math.round(json.length/1024) + 'KB,', matches.length, 'matches,', articles.length, 'articles');
+            // Read template, inject data snapshot
+            let html = fs.readFileSync('index.template.html', 'utf8');
+            const snapshot = JSON.stringify(data);
+            html = html.replace('/*SNAPSHOT_PLACEHOLDER*/', 'window.WC_SNAPSHOT = ' + snapshot + ';');
+            fs.writeFileSync('index.html', html);
+
+            // Also write data.json as backup
+            fs.writeFileSync('data.json', snapshot);
+
+            console.log('Built index.html with', matches.length, 'matches,', articles.length, 'articles');
 
       - name: Commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data.json
+          git add index.html data.json
           git diff --staged --quiet && echo "No changes" && exit 0
           git commit -m "data: update $(date -u +%Y-%m-%dT%H:%M:%SZ)"
           git pull --rebase origin main
