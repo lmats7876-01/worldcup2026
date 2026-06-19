@@ -574,10 +574,79 @@ function matchCard(m, standings) {
     <div class="match-time ${timeClass}">${timeLabel}</div>
     <div class="match-teams">
       <div class="match-team">${m.homeTeam.name} vs ${m.awayTeam.name}</div>
-      <div class="match-venue">${[m.venue ? '🏟 ' + m.venue : null, m.group].filter(Boolean).join(' · ')}</div>
+      <div class="match-venue">${[getVenue(m) ? '🏟 ' + getVenue(m) : null, m.group].filter(Boolean).join(' · ')}</div>
     </div>
     ${scoreHtml}
   </a>`;
+}
+
+
+// ── Venue lookup (football-data.org free tier omits venue field) ──
+const VENUE_MAP = {
+  // Group A
+  'Mexico':       { home: 'Estadio Akron, Guadalajara' },
+  // Group B
+  'Switzerland':  { home: 'SoFi Stadium, Los Angeles' },
+  'Canada':       { home: 'BC Place, Vancouver' },
+  'Qatar':        { home: 'BC Place, Vancouver' },
+  'Bosnia-Herzegovina': { home: 'SoFi Stadium, Los Angeles' },
+  // Group C
+  'Scotland':     { home: 'AT&T Stadium, Dallas' },
+  'Brazil':       { home: 'Levi's Stadium, San Jose' },
+  'Morocco':      { home: 'Levi's Stadium, San Jose' },
+  'Haiti':        { home: 'AT&T Stadium, Dallas' },
+  // Group D
+  'United States':{ home: 'SoFi Stadium, Los Angeles' },
+  'Australia':    { home: 'Lumen Field, Seattle' },
+  'Turkey':       { home: 'Lumen Field, Seattle' },
+  'Paraguay':     { home: 'SoFi Stadium, Los Angeles' },
+  // Group E
+  'Germany':      { home: 'MetLife Stadium, New York' },
+  'Japan':        { home: 'MetLife Stadium, New York' },
+  'Norway':       { home: 'Arrowhead Stadium, Kansas City' },
+  'Austria':      { home: 'Arrowhead Stadium, Kansas City' },
+  // Group F
+  'Sweden':       { home: 'Hard Rock Stadium, Miami' },
+  'Netherlands':  { home: 'Hard Rock Stadium, Miami' },
+  'Uruguay':      { home: 'Lincoln Financial Field, Philadelphia' },
+  'Saudi Arabia': { home: 'Lincoln Financial Field, Philadelphia' },
+  // Group G
+  'Ivory Coast':  { home: 'Mercedes-Benz Stadium, Atlanta' },
+  'Belgium':      { home: 'Mercedes-Benz Stadium, Atlanta' },
+  'Egypt':        { home: 'Mercedes-Benz Stadium, Atlanta' },
+  'Ecuador':      { home: 'Mercedes-Benz Stadium, Atlanta' },
+  // Group H
+  'Iran':         { home: 'Estadio BBVA, Monterrey' },
+  'New Zealand':  { home: 'Estadio BBVA, Monterrey' },
+  // Group I
+  'Spain':        { home: 'Estadio Azteca, Mexico City' },
+  'France':       { home: 'Estadio Azteca, Mexico City' },
+  'Senegal':      { home: 'Estadio Azteca, Mexico City' },
+  'Cape Verde Islands': { home: 'Estadio Azteca, Mexico City' },
+  // Group J
+  'Argentina':    { home: 'Arrowhead Stadium, Kansas City' },
+  'Algeria':      { home: 'Arrowhead Stadium, Kansas City' },
+  'Iraq':         { home: 'AT&T Stadium, Dallas' },
+  // Group K
+  'Colombia':     { home: 'Estadio Azteca, Mexico City' },
+  'Portugal':     { home: 'Estadio Ciudad de Mexico' },
+  'Congo DR':     { home: 'Estadio Ciudad de Mexico' },
+  'Uzbekistan':   { home: 'Estadio Azteca, Mexico City' },
+  // Group L
+  'England':      { home: 'AT&T Stadium, Dallas' },
+  'Ghana':        { home: 'BMO Field, Toronto' },
+  'Croatia':      { home: 'AT&T Stadium, Dallas' },
+  'Panama':       { home: 'BMO Field, Toronto' },
+};
+
+function getVenue(m) {
+  if (m.venue) return m.venue;
+  // Look up by home team name
+  const home = m.homeTeam?.name || '';
+  for (const [key, val] of Object.entries(VENUE_MAP)) {
+    if (home.includes(key)) return val.home;
+  }
+  return null;
 }
 
 function getTeamPoints(teamName, standings) {
