@@ -23,7 +23,25 @@ jobs:
           curl -s -H "X-Auth-Token: $FOOTBALL_KEY" "https://api.football-data.org/v4/competitions/WC/standings" -o standings.json
           curl -s -H "X-Auth-Token: $FOOTBALL_KEY" "https://api.football-data.org/v4/competitions/WC/scorers?limit=15" -o scorers.json
           curl -s "https://gnews.io/api/v4/search?q=%22World+Cup+2026%22&lang=en&max=12&sortby=publishedAt&token=$NEWS_KEY" -o news.json
-          python3 merge.py
+
+      - name: Merge into data.json
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const matches   = JSON.parse(fs.readFileSync('matches.json',   'utf8'));
+            const standings = JSON.parse(fs.readFileSync('standings.json', 'utf8'));
+            const scorers   = JSON.parse(fs.readFileSync('scorers.json',   'utf8'));
+            const news      = JSON.parse(fs.readFileSync('news.json',      'utf8'));
+            const out = {
+              updated:   new Date().toISOString(),
+              matches,
+              standings,
+              scorers,
+              news
+            };
+            fs.writeFileSync('data.json', JSON.stringify(out));
+            console.log('Written:', matches.matches?.length, 'matches,', news.articles?.length, 'articles');
 
       - name: Commit
         run: |
