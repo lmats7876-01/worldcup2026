@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>2026 FIFA World Cup Dashboard</title>
+<title>2026 FIFA World Cup</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -15,167 +15,139 @@
   --green:#3fb950;--green-bg:rgba(63,185,80,0.1);
   --red:#f85149;--red-bg:rgba(248,81,73,0.1);
   --yellow:#d29922;--yellow-bg:rgba(210,153,34,0.1);
-  --gold:#ffd700;
-  --live-bg:rgba(248,81,73,0.12);
-  --live-border:rgba(248,81,73,0.4);
-  --ft-bg:rgba(63,185,80,0.08);
-  --ft-border:rgba(63,185,80,0.25);
-  --upcoming-bg:rgba(88,166,255,0.06);
-  --upcoming-border:rgba(88,166,255,0.2);
-  --font:'Inter',system-ui,sans-serif;
-  --radius:10px;--radius-sm:6px;
+  --gold:#ffd700;--font:'Inter',system-ui,sans-serif;--radius:10px;
 }
-body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
-
-/* HEADER */
-.header{background:linear-gradient(135deg,#1a0a2e 0%,#0d1117 60%);border-bottom:1px solid var(--border2);padding:0 24px;position:sticky;top:0;z-index:100}
-.header-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:14px 0 0;gap:16px}
-.brand{display:flex;align-items:center;gap:12px}
-.brand-icon{font-size:32px}
-.brand-title{font-size:20px;font-weight:600;color:#fff;letter-spacing:-0.3px}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;min-height:100vh}
+.header{background:linear-gradient(135deg,#1a0a2e 0%,#0d1117 60%);border-bottom:1px solid var(--border2);padding:0 20px;position:sticky;top:0;z-index:100}
+.header-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:12px 0 0;gap:12px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-icon{font-size:28px}
+.brand-title{font-size:18px;font-weight:600;color:#fff}
 .brand-sub{font-size:11px;color:var(--text2);margin-top:2px}
-.header-right{display:flex;align-items:center;gap:12px}
-.live-badge{background:var(--red);color:#fff;font-size:10px;font-weight:600;padding:3px 10px;border-radius:99px;animation:pulse 2s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
-.date-badge{font-size:12px;color:var(--text2)}
-.refresh-btn{background:var(--bg3);border:0.5px solid var(--border2);color:var(--text2);font-family:var(--font);font-size:11px;padding:4px 12px;border-radius:var(--radius-sm);cursor:pointer;transition:all .15s}
-.refresh-btn:hover{color:var(--blue);border-color:var(--blue)}
-.last-update{font-size:10px;color:var(--text3)}
-.nav-tabs{max-width:1400px;margin:10px auto 0;display:flex;gap:2px}
-.ntab{padding:8px 16px;font-family:var(--font);font-size:12px;font-weight:500;color:var(--text2);background:none;border:none;cursor:pointer;border-radius:var(--radius-sm) var(--radius-sm) 0 0;transition:all .15s}
+.hright{display:flex;align-items:center;gap:10px}
+.live-badge{background:var(--red);color:#fff;font-size:10px;font-weight:600;padding:3px 10px;border-radius:99px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.upd{font-size:11px;color:var(--text3)}
+.rbtn{background:var(--bg3);border:0.5px solid var(--border2);color:var(--text2);font-family:var(--font);font-size:11px;padding:4px 12px;border-radius:6px;cursor:pointer}
+.rbtn:hover{color:var(--blue);border-color:var(--blue)}
+.nav-tabs{max-width:1400px;margin:8px auto 0;display:flex;gap:2px;overflow-x:auto}
+.ntab{padding:7px 14px;font-family:var(--font);font-size:12px;font-weight:500;color:var(--text2);background:none;border:none;cursor:pointer;border-radius:6px 6px 0 0;transition:all .15s;white-space:nowrap}
 .ntab:hover{color:var(--text);background:var(--bg3)}
 .ntab.active{color:var(--blue);background:var(--bg);border-bottom:2px solid var(--blue)}
-
-/* TICKER */
 .ticker-wrap{background:#c8102e;overflow:hidden;padding:5px 0}
-.ticker-track{display:inline-flex;align-items:center;width:max-content;animation:wctick 40s linear infinite}
+.ticker-track{display:inline-flex;align-items:center;width:max-content;animation:tick 40s linear infinite}
 .ticker-track:hover{animation-play-state:paused}
-@keyframes wctick{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-.ticker-label{display:inline-block;background:rgba(0,0,0,0.3);color:#fff;font-size:9px;font-weight:700;padding:2px 12px;border-radius:0 99px 99px 0;margin-right:16px;letter-spacing:.08em;flex-shrink:0}
-.ticker-item{display:inline-flex;align-items:center;gap:6px;margin-right:36px;white-space:nowrap;font-size:11px}
-.ti-teams{color:rgba(255,255,255,0.85)}
-.ti-score{background:rgba(0,0,0,0.35);color:#fff;font-weight:700;padding:1px 8px;border-radius:4px;font-size:12px}
-.ti-ft{color:rgba(255,255,255,0.5);font-size:9px}
-.ticker-loading{color:rgba(255,255,255,0.6);font-size:11px;padding:0 20px}
-
-/* MAIN */
-.main{max-width:1400px;margin:0 auto;padding:16px 24px 48px}
+@keyframes tick{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.ticker-lbl{display:inline-block;background:rgba(0,0,0,.3);color:#fff;font-size:9px;font-weight:700;padding:2px 10px;border-radius:0 99px 99px 0;margin-right:14px;letter-spacing:.08em;flex-shrink:0}
+.ti{display:inline-flex;align-items:center;gap:5px;margin-right:32px;white-space:nowrap;font-size:11px}
+.ti-sc{background:rgba(0,0,0,.35);color:#fff;font-weight:700;padding:1px 7px;border-radius:4px}
+.ti-t{color:rgba(255,255,255,.75)}
+.ti-ft{color:rgba(255,255,255,.45);font-size:9px}
+.main{max-width:1400px;margin:0 auto;padding:14px 20px 48px}
 .tab-section{display:none}
 .tab-section.active{display:block}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-.col{display:flex;flex-direction:column;gap:14px}
-
-/* PANEL */
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.col{display:flex;flex-direction:column;gap:12px}
 .panel{background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--radius);overflow:hidden}
-.ph{padding:10px 14px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.ph-title{font-size:12px;font-weight:500;color:var(--text);display:flex;align-items:center;gap:7px}
-.ph-badge{font-size:9px;font-weight:600;padding:2px 8px;border-radius:99px}
-.badge-live{background:var(--red-bg);color:var(--red);border:1px solid rgba(248,81,73,0.3)}
-.badge-blue{background:var(--blue-bg);color:var(--blue)}
-.badge-green{background:var(--green-bg);color:var(--green)}
-.loading-msg{padding:24px;text-align:center;color:var(--text3);font-size:12px}
-.spinner-wrap{display:flex;flex-direction:column;align-items:center;gap:10px}
-.spinner{width:20px;height:20px;border:2px solid var(--border2);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite}
+.ph{padding:9px 13px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.pht{font-size:12px;font-weight:500;color:var(--text);display:flex;align-items:center;gap:6px}
+.pbadge{font-size:9px;font-weight:600;padding:2px 7px;border-radius:99px}
+.pb-live{background:var(--red-bg);color:var(--red);border:1px solid rgba(248,81,73,.3)}
+.pb-blue{background:var(--blue-bg);color:var(--blue)}
+.pb-green{background:var(--green-bg);color:var(--green)}
+.spin-wrap{padding:24px;text-align:center;color:var(--text3);font-size:12px}
+.spinner{width:20px;height:20px;border:2px solid var(--border2);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 10px}
 @keyframes spin{to{transform:rotate(360deg)}}
-.error-msg{padding:16px;text-align:center;color:var(--red);font-size:12px}
-
-/* MATCH ROWS */
-.match-day-hdr{padding:5px 14px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);background:var(--bg3);border-bottom:0.5px solid var(--border)}
-.match-row{padding:9px 14px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:10px;transition:background .1s;cursor:pointer;text-decoration:none;color:inherit;border-left:3px solid transparent}
-.match-row:last-child{border-bottom:none}
-.match-row:hover{background:var(--bg3)}
-.match-row.state-live{background:var(--live-bg);border-left-color:var(--red)}
-.match-row.state-ft{background:var(--ft-bg);border-left-color:var(--green)}
-.match-row.state-upcoming{background:var(--upcoming-bg);border-left-color:var(--blue)}
-.match-time{font-size:10px;font-weight:600;color:var(--blue);white-space:nowrap;width:48px;flex-shrink:0}
-.match-time.live{color:var(--red);animation:pulse 2s infinite}
-.match-time.ft{color:var(--green);font-weight:500}
-.match-teams{flex:1;min-width:0}
-.match-team{font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.match-venue{font-size:9px;color:var(--text3);margin-top:2px}
-.match-score-wrap{display:flex;flex-direction:column;align-items:center;min-width:54px}
-.match-score{font-size:16px;font-weight:700;color:var(--text);white-space:nowrap;text-align:center;line-height:1}
-.match-score.live{color:var(--red)}
-.match-score.ft{color:var(--green)}
-.match-score.upcoming{font-size:11px;color:var(--text3)}
-.match-pts{font-size:9px;color:var(--text3);margin-top:3px;text-align:center;white-space:nowrap}
-.match-pts .pts-val{font-weight:600;color:var(--blue)}
-.fav-tag{font-size:9px;font-weight:600;padding:2px 6px;border-radius:99px;white-space:nowrap;flex-shrink:0;background:var(--green-bg);color:var(--green)}
-.score-label{font-size:8px;color:var(--text3);text-align:center;margin-top:2px;text-transform:uppercase;letter-spacing:.04em}
-
-/* STANDINGS */
-.grp-hdr{padding:6px 14px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--blue);background:var(--bg3);border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.std-cols{padding:3px 14px;display:grid;grid-template-columns:16px 1fr 24px 24px 24px 24px 30px;gap:4px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;border-bottom:0.5px solid var(--border);background:var(--bg3)}
+.err-msg{padding:16px;text-align:center;color:var(--red);font-size:12px}
+.empty{padding:16px;text-align:center;color:var(--text3);font-size:12px}
+/* match rows */
+.mday{padding:4px 13px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);background:var(--bg3);border-bottom:0.5px solid var(--border)}
+.mrow{padding:8px 13px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:9px;text-decoration:none;color:inherit;border-left:3px solid transparent;transition:background .1s}
+.mrow:last-child{border-bottom:none}
+.mrow:hover{background:var(--bg3)}
+.mrow.live{background:var(--red-bg);border-left-color:var(--red)}
+.mrow.ft{background:rgba(63,185,80,.05);border-left-color:var(--green)}
+.mrow.upcoming{background:rgba(88,166,255,.04);border-left-color:var(--blue)}
+.mtime{font-size:10px;font-weight:600;width:46px;flex-shrink:0}
+.mtime.live{color:var(--red);animation:pulse 2s infinite}
+.mtime.ft{color:var(--green)}
+.mtime.up{color:var(--blue)}
+.mteams{flex:1;min-width:0}
+.mteam{font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mvenue{font-size:9px;color:var(--text3);margin-top:2px}
+.mscwrap{display:flex;flex-direction:column;align-items:center;min-width:52px}
+.msc{font-size:15px;font-weight:700;line-height:1}
+.msc.live{color:var(--red)}
+.msc.ft{color:var(--green)}
+.msc.up{font-size:11px;color:var(--text3)}
+.msc-lbl{font-size:8px;color:var(--text3);margin-top:2px;text-transform:uppercase;letter-spacing:.04em}
+.pts-row{font-size:9px;color:var(--text3);margin-top:2px}
+.pts-row span{color:var(--blue);font-weight:600}
+/* standings */
+.grp-hdr{padding:5px 13px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--blue);background:var(--bg3);border-bottom:0.5px solid var(--border);display:flex;justify-content:space-between}
+.std-cols{padding:2px 13px;display:grid;grid-template-columns:14px 1fr 22px 22px 22px 22px 28px;gap:3px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;border-bottom:0.5px solid var(--border);background:var(--bg3)}
 .std-cols span{text-align:center}
 .std-cols span:nth-child(2){text-align:left}
-.std-row{padding:6px 14px;display:grid;grid-template-columns:16px 1fr 24px 24px 24px 24px 30px;gap:4px;align-items:center;font-size:11px;border-bottom:0.5px solid var(--border);transition:background .1s}
-.std-row:last-child{border-bottom:none}
-.std-row:hover{background:var(--bg3)}
-.std-row.q1{border-left:2px solid var(--blue)}
-.std-row.q2{border-left:2px solid var(--green)}
-.std-row.q3{border-left:2px solid var(--yellow)}
-.std-pos{color:var(--text3);font-size:10px;font-weight:600}
-.std-team{color:var(--text);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.std-num{color:var(--text2);text-align:center}
-.std-pts{color:var(--text);font-weight:700;text-align:center}
-
-/* FAVORITES */
-.fav-row{padding:9px 14px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:10px}
-.fav-row:last-child{border-bottom:none}
-.fav-flag{font-size:18px;flex-shrink:0}
-.fav-team-name{font-size:13px;font-weight:500;color:var(--text);flex:1}
-.fav-odds{font-size:12px;font-weight:700;color:var(--green);width:50px;text-align:right}
-.fav-bar-wrap{width:80px;height:5px;background:var(--bg3);border-radius:99px;overflow:hidden;flex-shrink:0}
-.fav-bar{height:5px;border-radius:99px;background:var(--green)}
-
-/* NEWS */
-.news-row{padding:10px 14px;border-bottom:0.5px solid var(--border);display:flex;gap:10px;align-items:flex-start;text-decoration:none;color:inherit;transition:background .1s}
-.news-row:last-child{border-bottom:none}
-.news-row:hover{background:var(--bg3)}
-.news-flag{font-size:18px;flex-shrink:0;margin-top:1px}
-.news-hl{font-size:12px;font-weight:500;color:var(--text);line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.news-meta{font-size:10px;color:var(--text3);margin-top:3px;display:flex;gap:5px;align-items:center}
-.news-src{color:var(--blue)}
-
-/* VENUES */
-.venue-row{padding:9px 14px;border-bottom:0.5px solid var(--border);display:flex;gap:10px;align-items:flex-start}
-.venue-row:last-child{border-bottom:none}
-.venue-name{font-size:12px;font-weight:500;color:var(--text);margin-bottom:2px}
-.venue-city{font-size:10px;color:var(--text2);margin-bottom:3px}
-.venue-cap{font-size:9px;color:var(--text3)}
-.venue-today{display:inline-block;background:var(--red-bg);color:var(--red);font-size:9px;font-weight:600;padding:1px 6px;border-radius:4px;margin-left:6px;border:1px solid rgba(248,81,73,0.3)}
-
-/* GOLDEN BOOT */
-.boot-row{padding:8px 14px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:10px}
-.boot-row:last-child{border-bottom:none}
-.boot-rank{font-size:12px;font-weight:700;color:var(--text3);width:20px;flex-shrink:0}
-.boot-player{font-size:12px;font-weight:500;color:var(--text);flex:1}
-.boot-team{font-size:10px;color:var(--text2)}
-.boot-goals{font-size:16px;font-weight:700;color:var(--text)}
-
-/* FOOTER */
-.footer{border-top:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--text3);max-width:1400px;margin:0 auto}
+.srow{padding:5px 13px;display:grid;grid-template-columns:14px 1fr 22px 22px 22px 22px 28px;gap:3px;align-items:center;font-size:11px;border-bottom:0.5px solid var(--border)}
+.srow:last-child{border-bottom:none}
+.srow:hover{background:var(--bg3)}
+.srow.q1{border-left:2px solid var(--blue)}
+.srow.q2{border-left:2px solid var(--green)}
+.srow.q3{border-left:2px solid var(--yellow)}
+.spos{color:var(--text3);font-size:10px;font-weight:600}
+.steam{color:var(--text);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.snum{color:var(--text2);text-align:center}
+.spts{color:var(--text);font-weight:700;text-align:center}
+/* news */
+.nrow{padding:9px 13px;border-bottom:0.5px solid var(--border);display:flex;gap:9px;align-items:flex-start;text-decoration:none;color:inherit;transition:background .1s}
+.nrow:last-child{border-bottom:none}
+.nrow:hover{background:var(--bg3)}
+.nhl{font-size:12px;font-weight:500;color:var(--text);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.nmeta{font-size:10px;color:var(--text3);margin-top:3px}
+.nsrc{color:var(--blue)}
+/* favorites */
+.frow{padding:8px 13px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:9px}
+.frow:last-child{border-bottom:none}
+.fflag{font-size:18px;flex-shrink:0}
+.fname{font-size:13px;font-weight:500;color:var(--text);flex:1}
+.fodds{font-size:12px;font-weight:700;color:var(--green);width:48px;text-align:right}
+.fbar{width:80px;height:4px;background:var(--bg3);border-radius:99px;overflow:hidden;flex-shrink:0}
+.fbar-fill{height:4px;border-radius:99px;background:var(--green)}
+/* venues */
+.vrow{padding:8px 13px;border-bottom:0.5px solid var(--border);display:flex;gap:9px}
+.vrow:last-child{border-bottom:none}
+.vname{font-size:12px;font-weight:500;color:var(--text);margin-bottom:2px}
+.vcity{font-size:10px;color:var(--text2)}
+.vcap{font-size:9px;color:var(--text3);margin-top:2px}
+/* boot */
+.brow{padding:7px 13px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:9px}
+.brow:last-child{border-bottom:none}
+.brank{font-size:12px;font-weight:700;color:var(--text3);width:20px;flex-shrink:0}
+.bplayer{font-size:12px;font-weight:500;color:var(--text);flex:1}
+.bteam{font-size:10px;color:var(--text2)}
+.bgoals{font-size:16px;font-weight:700;color:var(--text)}
+/* disclaimer */
+.disc{padding:7px 13px;background:rgba(210,153,34,.08);border-bottom:0.5px solid rgba(210,153,34,.2);display:flex;gap:7px;align-items:flex-start;font-size:10px;color:var(--yellow);line-height:1.5}
+/* bracket */
+.br-rnd-hdr{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);text-align:center;padding:4px 4px 6px}
+.br-match{background:var(--bg2);border:0.5px solid var(--border2);border-radius:6px;overflow:hidden;width:120px}
+.br-team{padding:4px 7px;display:flex;align-items:center;gap:4px;font-size:10px;border-bottom:0.5px solid var(--border)}
+.br-team:last-child{border-bottom:none}
+.br-team.s1{border-left:2px solid var(--green)}
+.br-team.s2{border-left:2px solid var(--blue)}
+.br-tname{flex:1;color:var(--text);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.br-seed{font-size:9px;color:var(--text3);width:16px;flex-shrink:0}
+/* footer */
+.footer{border-top:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--text3);max-width:1400px;margin:0 auto}
 .footer a{color:var(--blue);text-decoration:none}
-.footer a:hover{text-decoration:underline}
-.footer-links{display:flex;gap:16px}
-
-@media(max-width:1000px){.grid3{grid-template-columns:1fr 1fr}.grid4{grid-template-columns:1fr 1fr}}
-@media(max-width:680px){.grid3,.grid2,.grid4{grid-template-columns:1fr}.main{padding:12px 12px 40px}}
+.footer-links{display:flex;gap:14px}
+@media(max-width:900px){.grid3,.grid4{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.grid3,.grid2,.grid4{grid-template-columns:1fr}.main{padding:10px 10px 40px}}
 </style>
-<!-- Data snapshot injected by GitHub Action — loads instantly with no network request -->
-<script>window.WC_SNAPSHOT = JSON.parse(atob("eyJ1cGRhdGVkIjoiMjAyNi0wNi0xOVQwMToyMDo1NS4wNTVaIiwibWF0Y2hlcyI6W3sidXRjRGF0ZSI6IjIwMjYtMDYtMTFUMTk6MDA6MDBaIiwic3RhdHVzIjoiRklOSVNIRUQiLCJncm91cCI6IkdST1VQX0EiLCJzdGFnZSI6IkdST1VQX1NUQUdFIiwiaG9tZVRlYW0iOnsibmFtZSI6Ik1leGljbyIsInNob3J0TmFtZSI6Ik1leGljbyIsInRsYSI6Ik1FWCJ9LCJhd2F5VGVhbSI6eyJuYW1lIjoiU291dGggQWZyaWNhIiwic2hvcnROYW1lIjoiU291dGggQWZyaWNhIiwidGxhIjoiUlNBIn0sInNjb3JlIjp7Indpbm5lciI6IkhPTUVfVEVBTSIsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOjIsImF3YXkiOjB9LCJoYWxmVGltZSI6eyJob21lIjoxLCJhd2F5IjowfX19LHsidXRjRGF0ZSI6IjIwMjYtMDYtMTJUMDI6MDA6MDBaIiwic3RhdHVzIjoiRklOSVNIRUQiLCJncm91cCI6IkdST1VQX0EiLCJzdGFnZSI6IkdST1VQX1NUQUdFIiwiaG9tZVRlYW0iOnsibmFtZSI6IlNvdXRoIEtvcmVhIiwic2hvcnROYW1lIjoiS29yZWEgUmVwdWJsaWMiLCJ0bGEiOiJLT1IifSwiYXdheVRlYW0iOnsibmFtZSI6IkN6ZWNoaWEiLCJzaG9ydE5hbWUiOiJDemVjaGlhIiwidGxhIjoiQ1pFIn0sInNjb3JlIjp7Indpbm5lciI6IkhPTUVfVEVBTSIsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOjIsImF3YXkiOjF9LCJoYWxmVGltZSI6eyJob21lIjowLCJhd2F5IjowfX19LHsidXRjRGF0ZSI6IjIwMjYtMDYtMTJUMTk6MDA6MDBaIiwic3RhdHVzIjoiRklOSVNIRUQiLCJncm91cCI6IkdST1VQX0IiLCJzdGFnZSI6IkdST1VQX1NUQUdFIiwiaG9tZVRlYW0iOnsibmFtZSI6IkNhbmFkYSIsInNob3J0TmFtZSI6IkNhbmFkYSIsInRsYSI6IkNBTiJ9LCJhd2F5VGVhbSI6eyJuYW1lIjoiQm9zbmlhLUhlcnplZ292aW5hIiwic2hvcnROYW1lIjoiQm9zbmlhLUguIiwidGxhIjoiQklIIn0sInNjb3JlIjp7Indpbm5lciI6IkRSQVciLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjoxLCJhd2F5IjoxfSwiaGFsZlRpbWUiOnsiaG9tZSI6MCwiYXdheSI6MX19fSx7InV0Y0RhdGUiOiIyMDI2LTA2LTEzVDAxOjAwOjAwWiIsInN0YXR1cyI6IkZJTklTSEVEIiwiZ3JvdXAiOiJHUk9VUF9EIiwic3RhZ2UiOiJHUk9VUF9TVEFHRSIsImhvbWVUZWFtIjp7Im5hbWUiOiJVbml0ZWQgU3RhdGVzIiwic2hvcnROYW1lIjoiVVNBIiwidGxhIjoiVVNBIn0sImF3YXlUZWFtIjp7Im5hbWUiOiJQYXJhZ3VheSIsInNob3J0TmFtZSI6IlBhcmFndWF5IiwidGxhIjoiUEFSIn0sInNjb3JlIjp7Indpbm5lciI6IkhPTUVfVEVBTSIsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOjQsImF3YXkiOjF9LCJoYWxmVGltZSI6eyJob21lIjozLCJhd2F5IjowfX19LHsidXRjRGF0ZSI6IjIwMjYtMDYtMTNUMTk6MDA6MDBaIiwic3RhdHVzIjoiRklOSVNIRUQiLCJncm91cCI6IkdST1VQX0IiLCJzdGFnZSI6IkdST1VQX1NUQUdFIiwiaG9tZVRlYW0iOnsibmFtZSI6IlFhdGFyIiwic2hvcnROYW1lIjoiUWF0YXIiLCJ0bGEiOiJRQVQifSwiYXdheVRlYW0iOnsibmFtZSI6IlN3aXR6ZXJsYW5kIiwic2hvcnROYW1lIjoiU3dpdHplcmxhbmQiLCJ0bGEiOiJTVUkifSwic2NvcmUiOnsid2lubmVyIjoiRFJBVyIsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOjEsImF3YXkiOjF9LCJoYWxmVGltZSI6eyJob21lIjowLCJhd2F5IjoxfX19LHsidXRjRGF0ZSI6IjIwMjYtMDYtMTNUMjI6MDA6MDBaIiwic3RhdHVzIjoiRklOSVNIRUQiLCJncm91cCI6IkdST1VQX0MiLCJzdGFnZSI6IkdST1VQX1NUQUdFIiwiaG9tZVRlYW0iOnsibmFtZSI6IkJyYXppbCIsInNob3J0TmFtZSI6IkJyYXppbCIsInRsYSI6IkJSQSJ9LCJhd2F5VGVhbSI6eyJuYW1lIjoiTW9yb2NjbyIsInNob3J0TmFtZSI6Ik1vcm9jY28iLCJ0bGEiOiJNQVIifSwic2NvcmUiOnsid2lubmVyIjoiRFJBVyIsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOjEsImF3YXkiOjF9LCJoYWxmVGltZSI6eyJob21lIjoxLCJhd2F5IjoxfX19LHsidXRjRGF0ZSI6IjIwMjYtMDYtMTRUMDE6MDA6MDBaIiwic3RhdHVzIjoiRklOSVNIRUQiLCJncm91cCI6IkdST1VQX0MiLCJzdGFnZSI6IkdST1VQX1NUQUdFIiwiaG9tZVRlYW0iOnsibmFtZSI6IkhhaXRpIiwic2hvcnROYW1lIjoiSGFpdGkiLCJ0bGEiOiJIQUkifSwiYXdheVRlYW0iOnsibmFtZSI6IlNjb3RsYW5kIiwic2hvcnROYW1lIjoiU2NvdGxhbmQiLCJ0bGEiOiJTQ08ifSwic2NvcmUiOnsid2lubmVyIjoiQVdBWV9URUFNIiwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6MCwiYXdheSI6MX0sImhhbGZUaW1lIjp7ImhvbWUiOjAsImF3YXkiOjF9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNi0xNFQwNDowMDowMFoiLCJzdGF0dXMiOiJGSU5JU0hFRCIsImdyb3VwIjoiR1JPVVBfRCIsInN0YWdlIjoiR1JPVVBfU1RBR0UiLCJob21lVGVhbSI6eyJuYW1lIjoiQXVzdHJhbGlhIiwic2hvcnROYW1lIjoiQXVzdHJhbGlhIiwidGxhIjoiQVVTIn0sImF3YXlUZWFtIjp7Im5hbWUiOiJUdXJrZXkiLCJzaG9ydE5hbWUiOiJUdXJrZXkiLCJ0bGEiOiJUVVIifSwic2NvcmUiOnsid2lubmVyIjoiSE9NRV9URUFNIiwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6MiwiYXdheSI6MH0sImhhbGZUaW1lIjp7ImhvbWUiOjEsImF3YXkiOjB9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNi0xNFQxNzowMDowMFoiLCJzdGF0dXMiOiJGSU5JU0hFRCIsImdyb3VwIjoiR1JPVVBfRSIsInN0YWdlIjoiR1JPVVBfU1RBR0UiLCJob21lVGVhbSI6eyJuYW1lIjoiR2VybWFueSIsInNob3J0TmFtZSI6Ikdlcm1hbnkiLCJ0bGEiOiJHRVIifSwiYXdheVRlYW0iOnsibmFtZSI6IkN1cmHDp2FvIiwic2hvcnROYW1lIjoiQ3VyYcOnYW8iLCJ0bGEiOiJDVVcifSwic2NvcmUiOnsid2lubmVyIjoiSE9NRV9URUFNIiwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6NywiYXdheSI6MX0sImhhbGZUaW1lIjp7ImhvbWUiOjMsImF3YXkiOjF9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNi0xNFQyMDowMDowMFoiLCJzdGF0dXMiOiJGSU5JU0hFRCIsImdyb3VwIjoiR1JPVVBfRiIsInN0YWdlIjoiR1JPVVBfU1RBR0UiLCJob21lVGVhbSI6eyJuYW1lIjoiTmV0aGVybGFuZHMiLCJzaG9ydE5hbWUiOiJOZXRoZXJsYW5kcyIsInRsYSI6Ik5FRCJ9LCJhd2F5VGVhbSI6eyJuYW1lIjoiSmFwYW4iLCJzaG9ydE5hbWUiOiJKYXBhbiIsInRsYSI6IkpQTiJ9LCJzY29yZSI6eyJ3aW5uZXIiOiJEUkFXIiwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6MiwiYXdheSI6Mn0sImhhbGZUaW1lIjp7ImhvbWUiOjAsImF3YXkiOjB9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNi0xNFQyMzowMDowMFoiLCJzdGF0dXMiOiJGSU5JU0hFRCIsImdyb3VwIjoiR1JPVVBfRSIsInN0YWdlIjoiR1JPVVBfU1RBR0UiLCJob21lVGVhbSI6eyJuYW1lIjoiSXZvcnkgQ29hc3QiLCJzaG9ydE5hbWUiOiJJdm9yeSBDb2FzdCIsInRsYSI6IkNJViJ9LCJhd2F5VGVhbSI6eyJuYW1lIjoiRWN1YWRvciIsInNob3J0TmFtZSI6IkVjdWFkb3IiLCJ0bGEiOiJFQ1UifSwic2NvcmUiOnsid2lubmVyIjoiSE9NRV9URUFNIiwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6MSwiYXdheSI6MH0sImhhbGZUaW1lIjp7ImhvbWUiOjAsImF3YXkiOjB9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNi0xNVQwMjowMDowMFoiLCJzdGF0dXMiOiJGSU5JU0hFRCIsImdyb3VwIjoiR1JPVVBfRiIsInN0YWdlIjoiR1JPVVBfU1RBR0UiLCJob21lVGVhbSI6eyJuYW1lIjoiU3dlZGVuIiwic2hvcnROYW1lIjoiU3dlZGVuIiwidGxhIjoiU1dFIn0sImF3YXlUZWFtIjp7Im5hbWUiOiJUdW5pc2lhIiwic2hvcnROYW1lIjoiVHVuaXNpYSIsInRsYSI6IlRVTiJ9LCJzY29yZSI6eyJ3aW5uZXIiOiJIT01FX1RFQU0iLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjo1LCJhd2F5IjoxfSwiaGFsZlRpbWUiOnsiaG9tZSI6MiwiYXdheSI6MX19fSx7InV0Y0RhdGUiOiIyMDI2LTA2LTE1VDE2OjAwOjAwWiIsInN0YXR1cyI6IkZJTklTSEVEIiwiZ3JvdXAiOiJHUk9VUF9IIiwic3RhZ2UiOiJHUk9VUF9TVEFHRSIsImhvbWVUZWFtIjp7Im5hbWUiOiJTcGFpbiIsInNob3J0TmFtZSI6IlNwYWluIiwidGxhIjoiRVNQIn0sImF3YXlUZWFtIjp7Im5hbWUiOiJDYXBlIFZlcmRlIElzbGFuZHMiLCJzaG9ydE5hbWUiOiJDYXBlIFZlcmRlIiwidGxhIjoiQ1BWIn0sInNjb3JlIjp7Indpbm5lciI6IkRSQVciLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjowLCJhd2F5IjowfSwiaGFsZlRpbWUiOnsiaG9tZSI6MCwiYXdheSI6MH19fSx7InV0Y0RhdGUiOiIyMDI2LTA2LTE1VDE5OjAwOjAwWiIsInN0YXR1cyI6IkZJTklTSEVEIiwiZ3JvdXAiOiJHUk9VUF9HIiwic3RhZ2UiOiJHUk9VUF9TVEFHRSIsImhvbWVUZWFtIjp7Im5hbWUiOiJCZWxnaXVtIiwic2hvcnROYW1lIjoiQmVsZ2l1bSIsInRsYSI6IkJFTCJ9LCJhd2F5VGVhbSI6eyJuYW1lIjoiRWd5cHQiLCJzaG9ydE5hbWUiOiJFZ3lwdCIsInRsYSI6IkVHWSJ9LCJzY29yZSI6eyJ3aW5uZXIiOiJEUkFXIiwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6MSwiYXdheSI6MX0sImhhbGZUaW1lIjp7ImhvbWUiOjAsImF3YXkiOjF9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNi0xNVQyMjowMDowMFoiLCJzdGF0dXMiOiJGSU5JU0hFRCIsImdyb3VwIjoiR1JPVVBfSCIsInN0YWdlIjoiR1JPVVBfU1RBR0UiLCJob21lVGVhbSI6eyJuYW1lIjoiU2F1ZGkgQXJhYmlhIiwic2hvcnROYW1lIjoiU2F1ZGkgQXJhYmlhIiwidGxhIjoiS1NBIn0sImF3YXlUZWFtIjp7Im5hbWUiOiJVcnVndWF5Iiwic2hvcnROYW1lIjoiVXJ1Z3VheSIsInRsYSI6IlVSWSJ9LCJzY29yZSI6eyJ3aW5uZXIiOiJEUkFXIiwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6MSwiYXdheSI6MX0sImhhbGZUaW1lIjp7ImhvbWUiOjEsImF3YXkiOjB9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNi0xNlQwMTowMDowMFoiLCJzdGF0dXMiOiJGSU5JU0hFRCIsImdyb3VwIjoiR1JPVVBfRyIsInN0YWdlIjoiR1JPVVBfU1RBR0UiLCJob21lVGVhbSI6eyJuYW1lIjoiSXJhbiIsInNob3J0TmFtZSI6IklyYW4iLCJ0bGEiOiJJUk4ifSwiYXdheVRlYW0iOnsibmFtZSI6Ik5ldyBaZWFsYW5kIiwic2hvcnROYW1lIjoiTmV3IFplYWxhbmQiLCJ0bGEiOiJOWkwifSwic2NvcmUiOnsid2lubmVyIjoiRFJBVyIsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOjIsImF3YXkiOjJ9LCJoYWxmVGltZSI6eyJob21lIjoxLCJhd2F5IjoxfX19LHsidXRjRGF0ZSI6IjIwMjYtMDYtMTZUMTk6MDA6MDBaIiwic3RhdHVzIjoiRklOSVNIRUQiLCJncm91cCI6IkdST1VQX0kiLCJzdGFnZSI6IkdST1VQX1NUQUdFIiwiaG9tZVRlYW0iOnsibmFtZSI6IkZyYW5jZSIsInNob3J0TmFtZSI6IkZyYW5jZSIsInRsYSI6IkZSQSJ9LCJhd2F5VGVhbSI6eyJuYW1lIjoiU2VuZWdhbCIsInNob3J0TmFtZSI6IlNlbmVnYWwiLCJ0bGEiOiJTRU4ifSwic2NvcmUiOnsid2lubmVyIjoiSE9NRV9URUFNIiwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6MywiYXdheSI6MX0sImhhbGZUaW1lIjp7ImhvbWUiOjAsImF3YXkiOjB9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNi0xNlQyMjowMDowMFoiLCJzdGF0dXMiOiJGSU5JU0hFRCIsImdyb3VwIjoiR1JPVVBfSSIsInN0YWdlIjoiR1JPVVBfU1RBR0UiLCJob21lVGVhbSI6eyJuYW1lIjoiSXJhcSIsInNob3J0TmFtZSI6IklyYXEiLCJ0bGEiOiJJUlEifSwiYXdheVRlYW0iOnsibmFtZSI6Ik5vcndheSIsInNob3J0TmFtZSI6Ik5vcndheSIsInRsYSI6Ik5PUiJ9LCJzY29yZSI6eyJ3aW5uZXIiOiJBV0FZX1RFQU0iLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjoxLCJhd2F5Ijo0fSwiaGFsZlRpbWUiOnsiaG9tZSI6MSwiYXdheSI6Mn19fSx7InV0Y0RhdGUiOiIyMDI2LTA2LTE3VDAxOjAwOjAwWiIsInN0YXR1cyI6IkZJTklTSEVEIiwiZ3JvdXAiOiJHUk9VUF9KIiwic3RhZ2UiOiJHUk9VUF9TVEFHRSIsImhvbWVUZWFtIjp7Im5hbWUiOiJBcmdlbnRpbmEiLCJzaG9ydE5hbWUiOiJBcmdlbnRpbmEiLCJ0bGEiOiJBUkcifSwiYXdheVRlYW0iOnsibmFtZSI6IkFsZ2VyaWEiLCJzaG9ydE5hbWUiOiJBbGdlcmlhIiwidGxhIjoiQUxHIn0sInNjb3JlIjp7Indpbm5lciI6IkhPTUVfVEVBTSIsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOjMsImF3YXkiOjB9LCJoYWxmVGltZSI6eyJob21lIjoxLCJhd2F5IjowfX19LHsidXRjRGF0ZSI6IjIwMjYtMDYtMTdUMDQ6MDA6MDBaIiwic3RhdHVzIjoiRklOSVNIRUQiLCJncm91cCI6IkdST1VQX0oiLCJzdGFnZSI6IkdST1VQX1NUQUdFIiwiaG9tZVRlYW0iOnsibmFtZSI6IkF1c3RyaWEiLCJzaG9ydE5hbWUiOiJBdXN0cmlhIiwidGxhIjoiQVVUIn0sImF3YXlUZWFtIjp7Im5hbWUiOiJKb3JkYW4iLCJzaG9ydE5hbWUiOiJKb3JkYW4iLCJ0bGEiOiJKT1IifSwic2NvcmUiOnsid2lubmVyIjoiSE9NRV9URUFNIiwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6MywiYXdheSI6MX0sImhhbGZUaW1lIjp7ImhvbWUiOjEsImF3YXkiOjB9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNi0xN1QxNzowMDowMFoiLCJzdGF0dXMiOiJGSU5JU0hFRCIsImdyb3VwIjoiR1JPVVBfSyIsInN0YWdlIjoiR1JPVVBfU1RBR0UiLCJob21lVGVhbSI6eyJuYW1lIjoiUG9ydHVnYWwiLCJzaG9ydE5hbWUiOiJQb3J0dWdhbCIsInRsYSI6IlBPUiJ9LCJhd2F5VGVhbSI6eyJuYW1lIjoiQ29uZ28gRFIiLCJzaG9ydE5hbWUiOiJDb25nbyBEUiIsInRsYSI6IkNPRCJ9LCJzY29yZSI6eyJ3aW5uZXIiOiJEUkFXIiwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6MSwiYXdheSI6MX0sImhhbGZUaW1lIjp7ImhvbWUiOjEsImF3YXkiOjF9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNi0xN1QyMDowMDowMFoiLCJzdGF0dXMiOiJGSU5JU0hFRCIsImdyb3VwIjoiR1JPVVBfTCIsInN0YWdlIjoiR1JPVVBfU1RBR0UiLCJob21lVGVhbSI6eyJuYW1lIjoiRW5nbGFuZCIsInNob3J0TmFtZSI6IkVuZ2xhbmQiLCJ0bGEiOiJFTkcifSwiYXdheVRlYW0iOnsibmFtZSI6IkNyb2F0aWEiLCJzaG9ydE5hbWUiOiJDcm9hdGlhIiwidGxhIjoiQ1JPIn0sInNjb3JlIjp7Indpbm5lciI6IkhPTUVfVEVBTSIsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOjQsImF3YXkiOjJ9LCJoYWxmVGltZSI6eyJob21lIjoyLCJhd2F5IjoyfX19LHsidXRjRGF0ZSI6IjIwMjYtMDYtMTdUMjM6MDA6MDBaIiwic3RhdHVzIjoiRklOSVNIRUQiLCJncm91cCI6IkdST1VQX0wiLCJzdGFnZSI6IkdST1VQX1NUQUdFIiwiaG9tZVRlYW0iOnsibmFtZSI6IkdoYW5hIiwic2hvcnROYW1lIjoiR2hhbmEiLCJ0bGEiOiJHSEEifSwiYXdheVRlYW0iOnsibmFtZSI6IlBhbmFtYSIsInNob3J0TmFtZSI6IlBhbmFtYSIsInRsYSI6IlBBTiJ9LCJzY29yZSI6eyJ3aW5uZXIiOiJIT01FX1RFQU0iLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjoxLCJhd2F5IjowfSwiaGFsZlRpbWUiOnsiaG9tZSI6MCwiYXdheSI6MH19fSx7InV0Y0RhdGUiOiIyMDI2LTA2LTE4VDAyOjAwOjAwWiIsInN0YXR1cyI6IkZJTklTSEVEIiwiZ3JvdXAiOiJHUk9VUF9LIiwic3RhZ2UiOiJHUk9VUF9TVEFHRSIsImhvbWVUZWFtIjp7Im5hbWUiOiJVemJla2lzdGFuIiwic2hvcnROYW1lIjoiVXpiZWtpc3RhbiIsInRsYSI6IlVaQiJ9LCJhd2F5VGVhbSI6eyJuYW1lIjoiQ29sb21iaWEiLCJzaG9ydE5hbWUiOiJDb2xvbWJpYSIsInRsYSI6IkNPTCJ9LCJzY29yZSI6eyJ3aW5uZXIiOiJBV0FZX1RFQU0iLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjoxLCJhd2F5IjozfSwiaGFsZlRpbWUiOnsiaG9tZSI6MCwiYXdheSI6MX19fSx7InV0Y0RhdGUiOiIyMDI2LTA2LTE4VDE2OjAwOjAwWiIsInN0YXR1cyI6IkZJTklTSEVEIiwiZ3JvdXAiOiJHUk9VUF9BIiwic3RhZ2UiOiJHUk9VUF9TVEFHRSIsImhvbWVUZWFtIjp7Im5hbWUiOiJDemVjaGlhIiwic2hvcnROYW1lIjoiQ3plY2hpYSIsInRsYSI6IkNaRSJ9LCJhd2F5VGVhbSI6eyJuYW1lIjoiU291dGggQWZyaWNhIiwic2hvcnROYW1lIjoiU291dGggQWZyaWNhIiwidGxhIjoiUlNBIn0sInNjb3JlIjp7Indpbm5lciI6IkRSQVciLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjoxLCJhd2F5IjoxfSwiaGFsZlRpbWUiOnsiaG9tZSI6MSwiYXdheSI6MH19fSx7InV0Y0RhdGUiOiIyMDI2LTA2LTE4VDE5OjAwOjAwWiIsInN0YXR1cyI6IkZJTklTSEVEIiwiZ3JvdXAiOiJHUk9VUF9CIiwic3RhZ2UiOiJHUk9VUF9TVEFHRSIsImhvbWVUZWFtIjp7Im5hbWUiOiJTd2l0emVybGFuZCIsInNob3J0TmFtZSI6IlN3aXR6ZXJsYW5kIiwidGxhIjoiU1VJIn0sImF3YXlUZWFtIjp7Im5hbWUiOiJCb3NuaWEtSGVyemVnb3ZpbmEiLCJzaG9ydE5hbWUiOiJCb3NuaWEtSC4iLCJ0bGEiOiJCSUgifSwic2NvcmUiOnsid2lubmVyIjoiSE9NRV9URUFNIiwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6NCwiYXdheSI6MX0sImhhbGZUaW1lIjp7ImhvbWUiOjAsImF3YXkiOjB9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNi0xOFQyMjowMDowMFoiLCJzdGF0dXMiOiJGSU5JU0hFRCIsImdyb3VwIjoiR1JPVVBfQiIsInN0YWdlIjoiR1JPVVBfU1RBR0UiLCJob21lVGVhbSI6eyJuYW1lIjoiQ2FuYWRhIiwic2hvcnROYW1lIjoiQ2FuYWRhIiwidGxhIjoiQ0FOIn0sImF3YXlUZWFtIjp7Im5hbWUiOiJRYXRhciIsInNob3J0TmFtZSI6IlFhdGFyIiwidGxhIjoiUUFUIn0sInNjb3JlIjp7Indpbm5lciI6IkhPTUVfVEVBTSIsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOjYsImF3YXkiOjB9LCJoYWxmVGltZSI6eyJob21lIjozLCJhd2F5IjowfX19LHsidXRjRGF0ZSI6IjIwMjYtMDYtMTlUMDE6MDA6MDBaIiwic3RhdHVzIjoiSU5fUExBWSIsImdyb3VwIjoiR1JPVVBfQSIsInN0YWdlIjoiR1JPVVBfU1RBR0UiLCJob21lVGVhbSI6eyJuYW1lIjoiTWV4aWNvIiwic2hvcnROYW1lIjoiTWV4aWNvIiwidGxhIjoiTUVYIn0sImF3YXlUZWFtIjp7Im5hbWUiOiJTb3V0aCBLb3JlYSIsInNob3J0TmFtZSI6IktvcmVhIFJlcHVibGljIiwidGxhIjoiS09SIn0sInNjb3JlIjp7Indpbm5lciI6IkRSQVciLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjowLCJhd2F5IjowfSwiaGFsZlRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH19fSx7InV0Y0RhdGUiOiIyMDI2LTA2LTE5VDE5OjAwOjAwWiIsInN0YXR1cyI6IlRJTUVEIiwiZ3JvdXAiOiJHUk9VUF9EIiwic3RhZ2UiOiJHUk9VUF9TVEFHRSIsImhvbWVUZWFtIjp7Im5hbWUiOiJVbml0ZWQgU3RhdGVzIiwic2hvcnROYW1lIjoiVVNBIiwidGxhIjoiVVNBIn0sImF3YXlUZWFtIjp7Im5hbWUiOiJBdXN0cmFsaWEiLCJzaG9ydE5hbWUiOiJBdXN0cmFsaWEiLCJ0bGEiOiJBVVMifSwic2NvcmUiOnsid2lubmVyIjpudWxsLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfSwiaGFsZlRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH19fSx7InV0Y0RhdGUiOiIyMDI2LTA2LTE5VDIyOjAwOjAwWiIsInN0YXR1cyI6IlRJTUVEIiwiZ3JvdXAiOiJHUk9VUF9DIiwic3RhZ2UiOiJHUk9VUF9TVEFHRSIsImhvbWVUZWFtIjp7Im5hbWUiOiJTY290bGFuZCIsInNob3J0TmFtZSI6IlNjb3RsYW5kIiwidGxhIjoiU0NPIn0sImF3YXlUZWFtIjp7Im5hbWUiOiJNb3JvY2NvIiwic2hvcnROYW1lIjoiTW9yb2NjbyIsInRsYSI6Ik1BUiJ9LCJzY29yZSI6eyJ3aW5uZXIiOm51bGwsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9LCJoYWxmVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfX19LHsidXRjRGF0ZSI6IjIwMjYtMDYtMjBUMDA6MzA6MDBaIiwic3RhdHVzIjoiVElNRUQiLCJncm91cCI6IkdST1VQX0MiLCJzdGFnZSI6IkdST1VQX1NUQUdFIiwiaG9tZVRlYW0iOnsibmFtZSI6IkJyYXppbCIsInNob3J0TmFtZSI6IkJyYXppbCIsInRsYSI6IkJSQSJ9LCJhd2F5VGVhbSI6eyJuYW1lIjoiSGFpdGkiLCJzaG9ydE5hbWUiOiJIYWl0aSIsInRsYSI6IkhBSSJ9LCJzY29yZSI6eyJ3aW5uZXIiOm51bGwsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9LCJoYWxmVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfX19LHsidXRjRGF0ZSI6IjIwMjYtMDYtMjBUMDM6MDA6MDBaIiwic3RhdHVzIjoiVElNRUQiLCJncm91cCI6IkdST1VQX0QiLCJzdGFnZSI6IkdST1VQX1NUQUdFIiwiaG9tZVRlYW0iOnsibmFtZSI6IlR1cmtleSIsInNob3J0TmFtZSI6IlR1cmtleSIsInRsYSI6IlRVUiJ9LCJhd2F5VGVhbSI6eyJuYW1lIjoiUGFyYWd1YXkiLCJzaG9ydE5hbWUiOiJQYXJhZ3VheSIsInRsYSI6IlBBUiJ9LCJzY29yZSI6eyJ3aW5uZXIiOm51bGwsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9LCJoYWxmVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfX19LHsidXRjRGF0ZSI6IjIwMjYtMDYtMjBUMTc6MDA6MDBaIiwic3RhdHVzIjoiVElNRUQiLCJncm91cCI6IkdST1VQX0YiLCJzdGFnZSI6IkdST1VQX1NUQUdFIiwiaG9tZVRlYW0iOnsibmFtZSI6Ik5ldGhlcmxhbmRzIiwic2hvcnROYW1lIjoiTmV0aGVybGFuZHMiLCJ0bGEiOiJORUQifSwiYXdheVRlYW0iOnsibmFtZSI6IlN3ZWRlbiIsInNob3J0TmFtZSI6IlN3ZWRlbiIsInRsYSI6IlNXRSJ9LCJzY29yZSI6eyJ3aW5uZXIiOm51bGwsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9LCJoYWxmVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfX19LHsidXRjRGF0ZSI6IjIwMjYtMDYtMjBUMjA6MDA6MDBaIiwic3RhdHVzIjoiVElNRUQiLCJncm91cCI6IkdST1VQX0UiLCJzdGFnZSI6IkdST1VQX1NUQUdFIiwiaG9tZVRlYW0iOnsibmFtZSI6Ikdlcm1hbnkiLCJzaG9ydE5hbWUiOiJHZXJtYW55IiwidGxhIjoiR0VSIn0sImF3YXlUZWFtIjp7Im5hbWUiOiJJdm9yeSBDb2FzdCIsInNob3J0TmFtZSI6Ikl2b3J5IENvYXN0IiwidGxhIjoiQ0lWIn0sInNjb3JlIjp7Indpbm5lciI6bnVsbCwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH0sImhhbGZUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNi0yMVQwMDowMDowMFoiLCJzdGF0dXMiOiJUSU1FRCIsImdyb3VwIjoiR1JPVVBfRSIsInN0YWdlIjoiR1JPVVBfU1RBR0UiLCJob21lVGVhbSI6eyJuYW1lIjoiRWN1YWRvciIsInNob3J0TmFtZSI6IkVjdWFkb3IiLCJ0bGEiOiJFQ1UifSwiYXdheVRlYW0iOnsibmFtZSI6IkN1cmHDp2FvIiwic2hvcnROYW1lIjoiQ3VyYcOnYW8iLCJ0bGEiOiJDVVcifSwic2NvcmUiOnsid2lubmVyIjpudWxsLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfSwiaGFsZlRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH19fSx7InV0Y0RhdGUiOiIyMDI2LTA2LTIxVDA0OjAwOjAwWiIsInN0YXR1cyI6IlRJTUVEIiwiZ3JvdXAiOiJHUk9VUF9GIiwic3RhZ2UiOiJHUk9VUF9TVEFHRSIsImhvbWVUZWFtIjp7Im5hbWUiOiJUdW5pc2lhIiwic2hvcnROYW1lIjoiVHVuaXNpYSIsInRsYSI6IlRVTiJ9LCJhd2F5VGVhbSI6eyJuYW1lIjoiSmFwYW4iLCJzaG9ydE5hbWUiOiJKYXBhbiIsInRsYSI6IkpQTiJ9LCJzY29yZSI6eyJ3aW5uZXIiOm51bGwsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9LCJoYWxmVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfX19LHsidXRjRGF0ZSI6IjIwMjYtMDYtMjFUMTY6MDA6MDBaIiwic3RhdHVzIjoiVElNRUQiLCJncm91cCI6IkdST1VQX0giLCJzdGFnZSI6IkdST1VQX1NUQUdFIiwiaG9tZVRlYW0iOnsibmFtZSI6IlNwYWluIiwic2hvcnROYW1lIjoiU3BhaW4iLCJ0bGEiOiJFU1AifSwiYXdheVRlYW0iOnsibmFtZSI6IlNhdWRpIEFyYWJpYSIsInNob3J0TmFtZSI6IlNhdWRpIEFyYWJpYSIsInRsYSI6IktTQSJ9LCJzY29yZSI6eyJ3aW5uZXIiOm51bGwsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9LCJoYWxmVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfX19LHsidXRjRGF0ZSI6IjIwMjYtMDYtMjFUMTk6MDA6MDBaIiwic3RhdHVzIjoiVElNRUQiLCJncm91cCI6IkdST1VQX0ciLCJzdGFnZSI6IkdST1VQX1NUQUdFIiwiaG9tZVRlYW0iOnsibmFtZSI6IkJlbGdpdW0iLCJzaG9ydE5hbWUiOiJCZWxnaXVtIiwidGxhIjoiQkVMIn0sImF3YXlUZWFtIjp7Im5hbWUiOiJJcmFuIiwic2hvcnROYW1lIjoiSXJhbiIsInRsYSI6IklSTiJ9LCJzY29yZSI6eyJ3aW5uZXIiOm51bGwsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9LCJoYWxmVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfX19LHsidXRjRGF0ZSI6IjIwMjYtMDYtMjFUMjI6MDA6MDBaIiwic3RhdHVzIjoiVElNRUQiLCJncm91cCI6IkdST1VQX0giLCJzdGFnZSI6IkdST1VQX1NUQUdFIiwiaG9tZVRlYW0iOnsibmFtZSI6IlVydWd1YXkiLCJzaG9ydE5hbWUiOiJVcnVndWF5IiwidGxhIjoiVVJZIn0sImF3YXlUZWFtIjp7Im5hbWUiOiJDYXBlIFZlcmRlIElzbGFuZHMiLCJzaG9ydE5hbWUiOiJDYXBlIFZlcmRlIiwidGxhIjoiQ1BWIn0sInNjb3JlIjp7Indpbm5lciI6bnVsbCwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH0sImhhbGZUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNi0yMlQwMTowMDowMFoiLCJzdGF0dXMiOiJUSU1FRCIsImdyb3VwIjoiR1JPVVBfRyIsInN0YWdlIjoiR1JPVVBfU1RBR0UiLCJob21lVGVhbSI6eyJuYW1lIjoiTmV3IFplYWxhbmQiLCJzaG9ydE5hbWUiOiJOZXcgWmVhbGFuZCIsInRsYSI6Ik5aTCJ9LCJhd2F5VGVhbSI6eyJuYW1lIjoiRWd5cHQiLCJzaG9ydE5hbWUiOiJFZ3lwdCIsInRsYSI6IkVHWSJ9LCJzY29yZSI6eyJ3aW5uZXIiOm51bGwsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9LCJoYWxmVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfX19LHsidXRjRGF0ZSI6IjIwMjYtMDYtMjJUMTc6MDA6MDBaIiwic3RhdHVzIjoiVElNRUQiLCJncm91cCI6IkdST1VQX0oiLCJzdGFnZSI6IkdST1VQX1NUQUdFIiwiaG9tZVRlYW0iOnsibmFtZSI6IkFyZ2VudGluYSIsInNob3J0TmFtZSI6IkFyZ2VudGluYSIsInRsYSI6IkFSRyJ9LCJhd2F5VGVhbSI6eyJuYW1lIjoiQXVzdHJpYSIsInNob3J0TmFtZSI6IkF1c3RyaWEiLCJ0bGEiOiJBVVQifSwic2NvcmUiOnsid2lubmVyIjpudWxsLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfSwiaGFsZlRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH19fSx7InV0Y0RhdGUiOiIyMDI2LTA2LTIyVDIxOjAwOjAwWiIsInN0YXR1cyI6IlRJTUVEIiwiZ3JvdXAiOiJHUk9VUF9JIiwic3RhZ2UiOiJHUk9VUF9TVEFHRSIsImhvbWVUZWFtIjp7Im5hbWUiOiJGcmFuY2UiLCJzaG9ydE5hbWUiOiJGcmFuY2UiLCJ0bGEiOiJGUkEifSwiYXdheVRlYW0iOnsibmFtZSI6IklyYXEiLCJzaG9ydE5hbWUiOiJJcmFxIiwidGxhIjoiSVJRIn0sInNjb3JlIjp7Indpbm5lciI6bnVsbCwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH0sImhhbGZUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNi0yM1QwMDowMDowMFoiLCJzdGF0dXMiOiJUSU1FRCIsImdyb3VwIjoiR1JPVVBfSSIsInN0YWdlIjoiR1JPVVBfU1RBR0UiLCJob21lVGVhbSI6eyJuYW1lIjoiTm9yd2F5Iiwic2hvcnROYW1lIjoiTm9yd2F5IiwidGxhIjoiTk9SIn0sImF3YXlUZWFtIjp7Im5hbWUiOiJTZW5lZ2FsIiwic2hvcnROYW1lIjoiU2VuZWdhbCIsInRsYSI6IlNFTiJ9LCJzY29yZSI6eyJ3aW5uZXIiOm51bGwsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9LCJoYWxmVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfX19LHsidXRjRGF0ZSI6IjIwMjYtMDYtMjNUMDM6MDA6MDBaIiwic3RhdHVzIjoiVElNRUQiLCJncm91cCI6IkdST1VQX0oiLCJzdGFnZSI6IkdST1VQX1NUQUdFIiwiaG9tZVRlYW0iOnsibmFtZSI6IkpvcmRhbiIsInNob3J0TmFtZSI6IkpvcmRhbiIsInRsYSI6IkpPUiJ9LCJhd2F5VGVhbSI6eyJuYW1lIjoiQWxnZXJpYSIsInNob3J0TmFtZSI6IkFsZ2VyaWEiLCJ0bGEiOiJBTEcifSwic2NvcmUiOnsid2lubmVyIjpudWxsLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfSwiaGFsZlRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH19fSx7InV0Y0RhdGUiOiIyMDI2LTA2LTIzVDE3OjAwOjAwWiIsInN0YXR1cyI6IlRJTUVEIiwiZ3JvdXAiOiJHUk9VUF9LIiwic3RhZ2UiOiJHUk9VUF9TVEFHRSIsImhvbWVUZWFtIjp7Im5hbWUiOiJQb3J0dWdhbCIsInNob3J0TmFtZSI6IlBvcnR1Z2FsIiwidGxhIjoiUE9SIn0sImF3YXlUZWFtIjp7Im5hbWUiOiJVemJla2lzdGFuIiwic2hvcnROYW1lIjoiVXpiZWtpc3RhbiIsInRsYSI6IlVaQiJ9LCJzY29yZSI6eyJ3aW5uZXIiOm51bGwsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9LCJoYWxmVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfX19LHsidXRjRGF0ZSI6IjIwMjYtMDYtMjNUMjA6MDA6MDBaIiwic3RhdHVzIjoiVElNRUQiLCJncm91cCI6IkdST1VQX0wiLCJzdGFnZSI6IkdST1VQX1NUQUdFIiwiaG9tZVRlYW0iOnsibmFtZSI6IkVuZ2xhbmQiLCJzaG9ydE5hbWUiOiJFbmdsYW5kIiwidGxhIjoiRU5HIn0sImF3YXlUZWFtIjp7Im5hbWUiOiJHaGFuYSIsInNob3J0TmFtZSI6IkdoYW5hIiwidGxhIjoiR0hBIn0sInNjb3JlIjp7Indpbm5lciI6bnVsbCwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH0sImhhbGZUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNi0yM1QyMzowMDowMFoiLCJzdGF0dXMiOiJUSU1FRCIsImdyb3VwIjoiR1JPVVBfTCIsInN0YWdlIjoiR1JPVVBfU1RBR0UiLCJob21lVGVhbSI6eyJuYW1lIjoiUGFuYW1hIiwic2hvcnROYW1lIjoiUGFuYW1hIiwidGxhIjoiUEFOIn0sImF3YXlUZWFtIjp7Im5hbWUiOiJDcm9hdGlhIiwic2hvcnROYW1lIjoiQ3JvYXRpYSIsInRsYSI6IkNSTyJ9LCJzY29yZSI6eyJ3aW5uZXIiOm51bGwsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9LCJoYWxmVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfX19LHsidXRjRGF0ZSI6IjIwMjYtMDYtMjRUMDI6MDA6MDBaIiwic3RhdHVzIjoiVElNRUQiLCJncm91cCI6IkdST1VQX0siLCJzdGFnZSI6IkdST1VQX1NUQUdFIiwiaG9tZVRlYW0iOnsibmFtZSI6IkNvbG9tYmlhIiwic2hvcnROYW1lIjoiQ29sb21iaWEiLCJ0bGEiOiJDT0wifSwiYXdheVRlYW0iOnsibmFtZSI6IkNvbmdvIERSIiwic2hvcnROYW1lIjoiQ29uZ28gRFIiLCJ0bGEiOiJDT0QifSwic2NvcmUiOnsid2lubmVyIjpudWxsLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfSwiaGFsZlRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH19fSx7InV0Y0RhdGUiOiIyMDI2LTA2LTI0VDE5OjAwOjAwWiIsInN0YXR1cyI6IlRJTUVEIiwiZ3JvdXAiOiJHUk9VUF9CIiwic3RhZ2UiOiJHUk9VUF9TVEFHRSIsImhvbWVUZWFtIjp7Im5hbWUiOiJTd2l0emVybGFuZCIsInNob3J0TmFtZSI6IlN3aXR6ZXJsYW5kIiwidGxhIjoiU1VJIn0sImF3YXlUZWFtIjp7Im5hbWUiOiJDYW5hZGEiLCJzaG9ydE5hbWUiOiJDYW5hZGEiLCJ0bGEiOiJDQU4ifSwic2NvcmUiOnsid2lubmVyIjpudWxsLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfSwiaGFsZlRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH19fSx7InV0Y0RhdGUiOiIyMDI2LTA2LTI0VDE5OjAwOjAwWiIsInN0YXR1cyI6IlRJTUVEIiwiZ3JvdXAiOiJHUk9VUF9CIiwic3RhZ2UiOiJHUk9VUF9TVEFHRSIsImhvbWVUZWFtIjp7Im5hbWUiOiJCb3NuaWEtSGVyemVnb3ZpbmEiLCJzaG9ydE5hbWUiOiJCb3NuaWEtSC4iLCJ0bGEiOiJCSUgifSwiYXdheVRlYW0iOnsibmFtZSI6IlFhdGFyIiwic2hvcnROYW1lIjoiUWF0YXIiLCJ0bGEiOiJRQVQifSwic2NvcmUiOnsid2lubmVyIjpudWxsLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfSwiaGFsZlRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH19fSx7InV0Y0RhdGUiOiIyMDI2LTA2LTI0VDIyOjAwOjAwWiIsInN0YXR1cyI6IlRJTUVEIiwiZ3JvdXAiOiJHUk9VUF9DIiwic3RhZ2UiOiJHUk9VUF9TVEFHRSIsImhvbWVUZWFtIjp7Im5hbWUiOiJNb3JvY2NvIiwic2hvcnROYW1lIjoiTW9yb2NjbyIsInRsYSI6Ik1BUiJ9LCJhd2F5VGVhbSI6eyJuYW1lIjoiSGFpdGkiLCJzaG9ydE5hbWUiOiJIYWl0aSIsInRsYSI6IkhBSSJ9LCJzY29yZSI6eyJ3aW5uZXIiOm51bGwsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9LCJoYWxmVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfX19LHsidXRjRGF0ZSI6IjIwMjYtMDYtMjRUMjI6MDA6MDBaIiwic3RhdHVzIjoiVElNRUQiLCJncm91cCI6IkdST1VQX0MiLCJzdGFnZSI6IkdST1VQX1NUQUdFIiwiaG9tZVRlYW0iOnsibmFtZSI6IlNjb3RsYW5kIiwic2hvcnROYW1lIjoiU2NvdGxhbmQiLCJ0bGEiOiJTQ08ifSwiYXdheVRlYW0iOnsibmFtZSI6IkJyYXppbCIsInNob3J0TmFtZSI6IkJyYXppbCIsInRsYSI6IkJSQSJ9LCJzY29yZSI6eyJ3aW5uZXIiOm51bGwsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9LCJoYWxmVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfX19LHsidXRjRGF0ZSI6IjIwMjYtMDYtMjVUMDE6MDA6MDBaIiwic3RhdHVzIjoiVElNRUQiLCJncm91cCI6IkdST1VQX0EiLCJzdGFnZSI6IkdST1VQX1NUQUdFIiwiaG9tZVRlYW0iOnsibmFtZSI6IkN6ZWNoaWEiLCJzaG9ydE5hbWUiOiJDemVjaGlhIiwidGxhIjoiQ1pFIn0sImF3YXlUZWFtIjp7Im5hbWUiOiJNZXhpY28iLCJzaG9ydE5hbWUiOiJNZXhpY28iLCJ0bGEiOiJNRVgifSwic2NvcmUiOnsid2lubmVyIjpudWxsLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfSwiaGFsZlRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH19fSx7InV0Y0RhdGUiOiIyMDI2LTA2LTI1VDAxOjAwOjAwWiIsInN0YXR1cyI6IlRJTUVEIiwiZ3JvdXAiOiJHUk9VUF9BIiwic3RhZ2UiOiJHUk9VUF9TVEFHRSIsImhvbWVUZWFtIjp7Im5hbWUiOiJTb3V0aCBBZnJpY2EiLCJzaG9ydE5hbWUiOiJTb3V0aCBBZnJpY2EiLCJ0bGEiOiJSU0EifSwiYXdheVRlYW0iOnsibmFtZSI6IlNvdXRoIEtvcmVhIiwic2hvcnROYW1lIjoiS29yZWEgUmVwdWJsaWMiLCJ0bGEiOiJLT1IifSwic2NvcmUiOnsid2lubmVyIjpudWxsLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfSwiaGFsZlRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH19fSx7InV0Y0RhdGUiOiIyMDI2LTA2LTI1VDIwOjAwOjAwWiIsInN0YXR1cyI6IlRJTUVEIiwiZ3JvdXAiOiJHUk9VUF9FIiwic3RhZ2UiOiJHUk9VUF9TVEFHRSIsImhvbWVUZWFtIjp7Im5hbWUiOiJFY3VhZG9yIiwic2hvcnROYW1lIjoiRWN1YWRvciIsInRsYSI6IkVDVSJ9LCJhd2F5VGVhbSI6eyJuYW1lIjoiR2VybWFueSIsInNob3J0TmFtZSI6Ikdlcm1hbnkiLCJ0bGEiOiJHRVIifSwic2NvcmUiOnsid2lubmVyIjpudWxsLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfSwiaGFsZlRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH19fSx7InV0Y0RhdGUiOiIyMDI2LTA2LTI1VDIwOjAwOjAwWiIsInN0YXR1cyI6IlRJTUVEIiwiZ3JvdXAiOiJHUk9VUF9FIiwic3RhZ2UiOiJHUk9VUF9TVEFHRSIsImhvbWVUZWFtIjp7Im5hbWUiOiJDdXJhw6dhbyIsInNob3J0TmFtZSI6IkN1cmHDp2FvIiwidGxhIjoiQ1VXIn0sImF3YXlUZWFtIjp7Im5hbWUiOiJJdm9yeSBDb2FzdCIsInNob3J0TmFtZSI6Ikl2b3J5IENvYXN0IiwidGxhIjoiQ0lWIn0sInNjb3JlIjp7Indpbm5lciI6bnVsbCwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH0sImhhbGZUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNi0yNVQyMzowMDowMFoiLCJzdGF0dXMiOiJUSU1FRCIsImdyb3VwIjoiR1JPVVBfRiIsInN0YWdlIjoiR1JPVVBfU1RBR0UiLCJob21lVGVhbSI6eyJuYW1lIjoiVHVuaXNpYSIsInNob3J0TmFtZSI6IlR1bmlzaWEiLCJ0bGEiOiJUVU4ifSwiYXdheVRlYW0iOnsibmFtZSI6Ik5ldGhlcmxhbmRzIiwic2hvcnROYW1lIjoiTmV0aGVybGFuZHMiLCJ0bGEiOiJORUQifSwic2NvcmUiOnsid2lubmVyIjpudWxsLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfSwiaGFsZlRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH19fSx7InV0Y0RhdGUiOiIyMDI2LTA2LTI1VDIzOjAwOjAwWiIsInN0YXR1cyI6IlRJTUVEIiwiZ3JvdXAiOiJHUk9VUF9GIiwic3RhZ2UiOiJHUk9VUF9TVEFHRSIsImhvbWVUZWFtIjp7Im5hbWUiOiJKYXBhbiIsInNob3J0TmFtZSI6IkphcGFuIiwidGxhIjoiSlBOIn0sImF3YXlUZWFtIjp7Im5hbWUiOiJTd2VkZW4iLCJzaG9ydE5hbWUiOiJTd2VkZW4iLCJ0bGEiOiJTV0UifSwic2NvcmUiOnsid2lubmVyIjpudWxsLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfSwiaGFsZlRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH19fSx7InV0Y0RhdGUiOiIyMDI2LTA2LTI2VDAyOjAwOjAwWiIsInN0YXR1cyI6IlRJTUVEIiwiZ3JvdXAiOiJHUk9VUF9EIiwic3RhZ2UiOiJHUk9VUF9TVEFHRSIsImhvbWVUZWFtIjp7Im5hbWUiOiJUdXJrZXkiLCJzaG9ydE5hbWUiOiJUdXJrZXkiLCJ0bGEiOiJUVVIifSwiYXdheVRlYW0iOnsibmFtZSI6IlVuaXRlZCBTdGF0ZXMiLCJzaG9ydE5hbWUiOiJVU0EiLCJ0bGEiOiJVU0EifSwic2NvcmUiOnsid2lubmVyIjpudWxsLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfSwiaGFsZlRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH19fSx7InV0Y0RhdGUiOiIyMDI2LTA2LTI2VDAyOjAwOjAwWiIsInN0YXR1cyI6IlRJTUVEIiwiZ3JvdXAiOiJHUk9VUF9EIiwic3RhZ2UiOiJHUk9VUF9TVEFHRSIsImhvbWVUZWFtIjp7Im5hbWUiOiJQYXJhZ3VheSIsInNob3J0TmFtZSI6IlBhcmFndWF5IiwidGxhIjoiUEFSIn0sImF3YXlUZWFtIjp7Im5hbWUiOiJBdXN0cmFsaWEiLCJzaG9ydE5hbWUiOiJBdXN0cmFsaWEiLCJ0bGEiOiJBVVMifSwic2NvcmUiOnsid2lubmVyIjpudWxsLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfSwiaGFsZlRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH19fSx7InV0Y0RhdGUiOiIyMDI2LTA2LTI2VDE5OjAwOjAwWiIsInN0YXR1cyI6IlRJTUVEIiwiZ3JvdXAiOiJHUk9VUF9JIiwic3RhZ2UiOiJHUk9VUF9TVEFHRSIsImhvbWVUZWFtIjp7Im5hbWUiOiJOb3J3YXkiLCJzaG9ydE5hbWUiOiJOb3J3YXkiLCJ0bGEiOiJOT1IifSwiYXdheVRlYW0iOnsibmFtZSI6IkZyYW5jZSIsInNob3J0TmFtZSI6IkZyYW5jZSIsInRsYSI6IkZSQSJ9LCJzY29yZSI6eyJ3aW5uZXIiOm51bGwsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9LCJoYWxmVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfX19LHsidXRjRGF0ZSI6IjIwMjYtMDYtMjZUMTk6MDA6MDBaIiwic3RhdHVzIjoiVElNRUQiLCJncm91cCI6IkdST1VQX0kiLCJzdGFnZSI6IkdST1VQX1NUQUdFIiwiaG9tZVRlYW0iOnsibmFtZSI6IlNlbmVnYWwiLCJzaG9ydE5hbWUiOiJTZW5lZ2FsIiwidGxhIjoiU0VOIn0sImF3YXlUZWFtIjp7Im5hbWUiOiJJcmFxIiwic2hvcnROYW1lIjoiSXJhcSIsInRsYSI6IklSUSJ9LCJzY29yZSI6eyJ3aW5uZXIiOm51bGwsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9LCJoYWxmVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfX19LHsidXRjRGF0ZSI6IjIwMjYtMDYtMjdUMDA6MDA6MDBaIiwic3RhdHVzIjoiVElNRUQiLCJncm91cCI6IkdST1VQX0giLCJzdGFnZSI6IkdST1VQX1NUQUdFIiwiaG9tZVRlYW0iOnsibmFtZSI6IlVydWd1YXkiLCJzaG9ydE5hbWUiOiJVcnVndWF5IiwidGxhIjoiVVJZIn0sImF3YXlUZWFtIjp7Im5hbWUiOiJTcGFpbiIsInNob3J0TmFtZSI6IlNwYWluIiwidGxhIjoiRVNQIn0sInNjb3JlIjp7Indpbm5lciI6bnVsbCwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH0sImhhbGZUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNi0yN1QwMDowMDowMFoiLCJzdGF0dXMiOiJUSU1FRCIsImdyb3VwIjoiR1JPVVBfSCIsInN0YWdlIjoiR1JPVVBfU1RBR0UiLCJob21lVGVhbSI6eyJuYW1lIjoiQ2FwZSBWZXJkZSBJc2xhbmRzIiwic2hvcnROYW1lIjoiQ2FwZSBWZXJkZSIsInRsYSI6IkNQViJ9LCJhd2F5VGVhbSI6eyJuYW1lIjoiU2F1ZGkgQXJhYmlhIiwic2hvcnROYW1lIjoiU2F1ZGkgQXJhYmlhIiwidGxhIjoiS1NBIn0sInNjb3JlIjp7Indpbm5lciI6bnVsbCwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH0sImhhbGZUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNi0yN1QwMzowMDowMFoiLCJzdGF0dXMiOiJUSU1FRCIsImdyb3VwIjoiR1JPVVBfRyIsInN0YWdlIjoiR1JPVVBfU1RBR0UiLCJob21lVGVhbSI6eyJuYW1lIjoiTmV3IFplYWxhbmQiLCJzaG9ydE5hbWUiOiJOZXcgWmVhbGFuZCIsInRsYSI6Ik5aTCJ9LCJhd2F5VGVhbSI6eyJuYW1lIjoiQmVsZ2l1bSIsInNob3J0TmFtZSI6IkJlbGdpdW0iLCJ0bGEiOiJCRUwifSwic2NvcmUiOnsid2lubmVyIjpudWxsLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfSwiaGFsZlRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH19fSx7InV0Y0RhdGUiOiIyMDI2LTA2LTI3VDAzOjAwOjAwWiIsInN0YXR1cyI6IlRJTUVEIiwiZ3JvdXAiOiJHUk9VUF9HIiwic3RhZ2UiOiJHUk9VUF9TVEFHRSIsImhvbWVUZWFtIjp7Im5hbWUiOiJFZ3lwdCIsInNob3J0TmFtZSI6IkVneXB0IiwidGxhIjoiRUdZIn0sImF3YXlUZWFtIjp7Im5hbWUiOiJJcmFuIiwic2hvcnROYW1lIjoiSXJhbiIsInRsYSI6IklSTiJ9LCJzY29yZSI6eyJ3aW5uZXIiOm51bGwsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9LCJoYWxmVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfX19LHsidXRjRGF0ZSI6IjIwMjYtMDYtMjdUMjE6MDA6MDBaIiwic3RhdHVzIjoiVElNRUQiLCJncm91cCI6IkdST1VQX0wiLCJzdGFnZSI6IkdST1VQX1NUQUdFIiwiaG9tZVRlYW0iOnsibmFtZSI6IlBhbmFtYSIsInNob3J0TmFtZSI6IlBhbmFtYSIsInRsYSI6IlBBTiJ9LCJhd2F5VGVhbSI6eyJuYW1lIjoiRW5nbGFuZCIsInNob3J0TmFtZSI6IkVuZ2xhbmQiLCJ0bGEiOiJFTkcifSwic2NvcmUiOnsid2lubmVyIjpudWxsLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfSwiaGFsZlRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH19fSx7InV0Y0RhdGUiOiIyMDI2LTA2LTI3VDIxOjAwOjAwWiIsInN0YXR1cyI6IlRJTUVEIiwiZ3JvdXAiOiJHUk9VUF9MIiwic3RhZ2UiOiJHUk9VUF9TVEFHRSIsImhvbWVUZWFtIjp7Im5hbWUiOiJDcm9hdGlhIiwic2hvcnROYW1lIjoiQ3JvYXRpYSIsInRsYSI6IkNSTyJ9LCJhd2F5VGVhbSI6eyJuYW1lIjoiR2hhbmEiLCJzaG9ydE5hbWUiOiJHaGFuYSIsInRsYSI6IkdIQSJ9LCJzY29yZSI6eyJ3aW5uZXIiOm51bGwsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9LCJoYWxmVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfX19LHsidXRjRGF0ZSI6IjIwMjYtMDYtMjdUMjM6MzA6MDBaIiwic3RhdHVzIjoiVElNRUQiLCJncm91cCI6IkdST1VQX0siLCJzdGFnZSI6IkdST1VQX1NUQUdFIiwiaG9tZVRlYW0iOnsibmFtZSI6IkNvbG9tYmlhIiwic2hvcnROYW1lIjoiQ29sb21iaWEiLCJ0bGEiOiJDT0wifSwiYXdheVRlYW0iOnsibmFtZSI6IlBvcnR1Z2FsIiwic2hvcnROYW1lIjoiUG9ydHVnYWwiLCJ0bGEiOiJQT1IifSwic2NvcmUiOnsid2lubmVyIjpudWxsLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfSwiaGFsZlRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH19fSx7InV0Y0RhdGUiOiIyMDI2LTA2LTI3VDIzOjMwOjAwWiIsInN0YXR1cyI6IlRJTUVEIiwiZ3JvdXAiOiJHUk9VUF9LIiwic3RhZ2UiOiJHUk9VUF9TVEFHRSIsImhvbWVUZWFtIjp7Im5hbWUiOiJDb25nbyBEUiIsInNob3J0TmFtZSI6IkNvbmdvIERSIiwidGxhIjoiQ09EIn0sImF3YXlUZWFtIjp7Im5hbWUiOiJVemJla2lzdGFuIiwic2hvcnROYW1lIjoiVXpiZWtpc3RhbiIsInRsYSI6IlVaQiJ9LCJzY29yZSI6eyJ3aW5uZXIiOm51bGwsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9LCJoYWxmVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfX19LHsidXRjRGF0ZSI6IjIwMjYtMDYtMjhUMDI6MDA6MDBaIiwic3RhdHVzIjoiVElNRUQiLCJncm91cCI6IkdST1VQX0oiLCJzdGFnZSI6IkdST1VQX1NUQUdFIiwiaG9tZVRlYW0iOnsibmFtZSI6IkpvcmRhbiIsInNob3J0TmFtZSI6IkpvcmRhbiIsInRsYSI6IkpPUiJ9LCJhd2F5VGVhbSI6eyJuYW1lIjoiQXJnZW50aW5hIiwic2hvcnROYW1lIjoiQXJnZW50aW5hIiwidGxhIjoiQVJHIn0sInNjb3JlIjp7Indpbm5lciI6bnVsbCwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH0sImhhbGZUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNi0yOFQwMjowMDowMFoiLCJzdGF0dXMiOiJUSU1FRCIsImdyb3VwIjoiR1JPVVBfSiIsInN0YWdlIjoiR1JPVVBfU1RBR0UiLCJob21lVGVhbSI6eyJuYW1lIjoiQWxnZXJpYSIsInNob3J0TmFtZSI6IkFsZ2VyaWEiLCJ0bGEiOiJBTEcifSwiYXdheVRlYW0iOnsibmFtZSI6IkF1c3RyaWEiLCJzaG9ydE5hbWUiOiJBdXN0cmlhIiwidGxhIjoiQVVUIn0sInNjb3JlIjp7Indpbm5lciI6bnVsbCwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH0sImhhbGZUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNi0yOFQxOTowMDowMFoiLCJzdGF0dXMiOiJUSU1FRCIsImdyb3VwIjpudWxsLCJzdGFnZSI6IkxBU1RfMzIiLCJob21lVGVhbSI6eyJuYW1lIjpudWxsLCJzaG9ydE5hbWUiOm51bGwsInRsYSI6bnVsbH0sImF3YXlUZWFtIjp7Im5hbWUiOm51bGwsInNob3J0TmFtZSI6bnVsbCwidGxhIjpudWxsfSwic2NvcmUiOnsid2lubmVyIjpudWxsLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfSwiaGFsZlRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH19fSx7InV0Y0RhdGUiOiIyMDI2LTA2LTI5VDE3OjAwOjAwWiIsInN0YXR1cyI6IlRJTUVEIiwiZ3JvdXAiOm51bGwsInN0YWdlIjoiTEFTVF8zMiIsImhvbWVUZWFtIjp7Im5hbWUiOm51bGwsInNob3J0TmFtZSI6bnVsbCwidGxhIjpudWxsfSwiYXdheVRlYW0iOnsibmFtZSI6bnVsbCwic2hvcnROYW1lIjpudWxsLCJ0bGEiOm51bGx9LCJzY29yZSI6eyJ3aW5uZXIiOm51bGwsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9LCJoYWxmVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfX19LHsidXRjRGF0ZSI6IjIwMjYtMDYtMjlUMjA6MzA6MDBaIiwic3RhdHVzIjoiVElNRUQiLCJncm91cCI6bnVsbCwic3RhZ2UiOiJMQVNUXzMyIiwiaG9tZVRlYW0iOnsibmFtZSI6bnVsbCwic2hvcnROYW1lIjpudWxsLCJ0bGEiOm51bGx9LCJhd2F5VGVhbSI6eyJuYW1lIjpudWxsLCJzaG9ydE5hbWUiOm51bGwsInRsYSI6bnVsbH0sInNjb3JlIjp7Indpbm5lciI6bnVsbCwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH0sImhhbGZUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNi0zMFQwMTowMDowMFoiLCJzdGF0dXMiOiJUSU1FRCIsImdyb3VwIjpudWxsLCJzdGFnZSI6IkxBU1RfMzIiLCJob21lVGVhbSI6eyJuYW1lIjpudWxsLCJzaG9ydE5hbWUiOm51bGwsInRsYSI6bnVsbH0sImF3YXlUZWFtIjp7Im5hbWUiOm51bGwsInNob3J0TmFtZSI6bnVsbCwidGxhIjpudWxsfSwic2NvcmUiOnsid2lubmVyIjpudWxsLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfSwiaGFsZlRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH19fSx7InV0Y0RhdGUiOiIyMDI2LTA2LTMwVDE3OjAwOjAwWiIsInN0YXR1cyI6IlRJTUVEIiwiZ3JvdXAiOm51bGwsInN0YWdlIjoiTEFTVF8zMiIsImhvbWVUZWFtIjp7Im5hbWUiOm51bGwsInNob3J0TmFtZSI6bnVsbCwidGxhIjpudWxsfSwiYXdheVRlYW0iOnsibmFtZSI6bnVsbCwic2hvcnROYW1lIjpudWxsLCJ0bGEiOm51bGx9LCJzY29yZSI6eyJ3aW5uZXIiOm51bGwsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9LCJoYWxmVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfX19LHsidXRjRGF0ZSI6IjIwMjYtMDYtMzBUMjE6MDA6MDBaIiwic3RhdHVzIjoiVElNRUQiLCJncm91cCI6bnVsbCwic3RhZ2UiOiJMQVNUXzMyIiwiaG9tZVRlYW0iOnsibmFtZSI6bnVsbCwic2hvcnROYW1lIjpudWxsLCJ0bGEiOm51bGx9LCJhd2F5VGVhbSI6eyJuYW1lIjpudWxsLCJzaG9ydE5hbWUiOm51bGwsInRsYSI6bnVsbH0sInNjb3JlIjp7Indpbm5lciI6bnVsbCwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH0sImhhbGZUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNy0wMVQwMTowMDowMFoiLCJzdGF0dXMiOiJUSU1FRCIsImdyb3VwIjpudWxsLCJzdGFnZSI6IkxBU1RfMzIiLCJob21lVGVhbSI6eyJuYW1lIjpudWxsLCJzaG9ydE5hbWUiOm51bGwsInRsYSI6bnVsbH0sImF3YXlUZWFtIjp7Im5hbWUiOm51bGwsInNob3J0TmFtZSI6bnVsbCwidGxhIjpudWxsfSwic2NvcmUiOnsid2lubmVyIjpudWxsLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfSwiaGFsZlRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH19fSx7InV0Y0RhdGUiOiIyMDI2LTA3LTAxVDE2OjAwOjAwWiIsInN0YXR1cyI6IlRJTUVEIiwiZ3JvdXAiOm51bGwsInN0YWdlIjoiTEFTVF8zMiIsImhvbWVUZWFtIjp7Im5hbWUiOm51bGwsInNob3J0TmFtZSI6bnVsbCwidGxhIjpudWxsfSwiYXdheVRlYW0iOnsibmFtZSI6bnVsbCwic2hvcnROYW1lIjpudWxsLCJ0bGEiOm51bGx9LCJzY29yZSI6eyJ3aW5uZXIiOm51bGwsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9LCJoYWxmVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfX19LHsidXRjRGF0ZSI6IjIwMjYtMDctMDFUMjA6MDA6MDBaIiwic3RhdHVzIjoiVElNRUQiLCJncm91cCI6bnVsbCwic3RhZ2UiOiJMQVNUXzMyIiwiaG9tZVRlYW0iOnsibmFtZSI6bnVsbCwic2hvcnROYW1lIjpudWxsLCJ0bGEiOm51bGx9LCJhd2F5VGVhbSI6eyJuYW1lIjpudWxsLCJzaG9ydE5hbWUiOm51bGwsInRsYSI6bnVsbH0sInNjb3JlIjp7Indpbm5lciI6bnVsbCwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH0sImhhbGZUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNy0wMlQwMDowMDowMFoiLCJzdGF0dXMiOiJUSU1FRCIsImdyb3VwIjpudWxsLCJzdGFnZSI6IkxBU1RfMzIiLCJob21lVGVhbSI6eyJuYW1lIjpudWxsLCJzaG9ydE5hbWUiOm51bGwsInRsYSI6bnVsbH0sImF3YXlUZWFtIjp7Im5hbWUiOm51bGwsInNob3J0TmFtZSI6bnVsbCwidGxhIjpudWxsfSwic2NvcmUiOnsid2lubmVyIjpudWxsLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfSwiaGFsZlRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH19fSx7InV0Y0RhdGUiOiIyMDI2LTA3LTAyVDE5OjAwOjAwWiIsInN0YXR1cyI6IlRJTUVEIiwiZ3JvdXAiOm51bGwsInN0YWdlIjoiTEFTVF8zMiIsImhvbWVUZWFtIjp7Im5hbWUiOm51bGwsInNob3J0TmFtZSI6bnVsbCwidGxhIjpudWxsfSwiYXdheVRlYW0iOnsibmFtZSI6bnVsbCwic2hvcnROYW1lIjpudWxsLCJ0bGEiOm51bGx9LCJzY29yZSI6eyJ3aW5uZXIiOm51bGwsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9LCJoYWxmVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfX19LHsidXRjRGF0ZSI6IjIwMjYtMDctMDJUMjM6MDA6MDBaIiwic3RhdHVzIjoiVElNRUQiLCJncm91cCI6bnVsbCwic3RhZ2UiOiJMQVNUXzMyIiwiaG9tZVRlYW0iOnsibmFtZSI6bnVsbCwic2hvcnROYW1lIjpudWxsLCJ0bGEiOm51bGx9LCJhd2F5VGVhbSI6eyJuYW1lIjpudWxsLCJzaG9ydE5hbWUiOm51bGwsInRsYSI6bnVsbH0sInNjb3JlIjp7Indpbm5lciI6bnVsbCwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH0sImhhbGZUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNy0wM1QwMzowMDowMFoiLCJzdGF0dXMiOiJUSU1FRCIsImdyb3VwIjpudWxsLCJzdGFnZSI6IkxBU1RfMzIiLCJob21lVGVhbSI6eyJuYW1lIjpudWxsLCJzaG9ydE5hbWUiOm51bGwsInRsYSI6bnVsbH0sImF3YXlUZWFtIjp7Im5hbWUiOm51bGwsInNob3J0TmFtZSI6bnVsbCwidGxhIjpudWxsfSwic2NvcmUiOnsid2lubmVyIjpudWxsLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfSwiaGFsZlRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH19fSx7InV0Y0RhdGUiOiIyMDI2LTA3LTAzVDE4OjAwOjAwWiIsInN0YXR1cyI6IlRJTUVEIiwiZ3JvdXAiOm51bGwsInN0YWdlIjoiTEFTVF8zMiIsImhvbWVUZWFtIjp7Im5hbWUiOm51bGwsInNob3J0TmFtZSI6bnVsbCwidGxhIjpudWxsfSwiYXdheVRlYW0iOnsibmFtZSI6bnVsbCwic2hvcnROYW1lIjpudWxsLCJ0bGEiOm51bGx9LCJzY29yZSI6eyJ3aW5uZXIiOm51bGwsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9LCJoYWxmVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfX19LHsidXRjRGF0ZSI6IjIwMjYtMDctMDNUMjI6MDA6MDBaIiwic3RhdHVzIjoiVElNRUQiLCJncm91cCI6bnVsbCwic3RhZ2UiOiJMQVNUXzMyIiwiaG9tZVRlYW0iOnsibmFtZSI6bnVsbCwic2hvcnROYW1lIjpudWxsLCJ0bGEiOm51bGx9LCJhd2F5VGVhbSI6eyJuYW1lIjpudWxsLCJzaG9ydE5hbWUiOm51bGwsInRsYSI6bnVsbH0sInNjb3JlIjp7Indpbm5lciI6bnVsbCwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH0sImhhbGZUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNy0wNFQwMTozMDowMFoiLCJzdGF0dXMiOiJUSU1FRCIsImdyb3VwIjpudWxsLCJzdGFnZSI6IkxBU1RfMzIiLCJob21lVGVhbSI6eyJuYW1lIjpudWxsLCJzaG9ydE5hbWUiOm51bGwsInRsYSI6bnVsbH0sImF3YXlUZWFtIjp7Im5hbWUiOm51bGwsInNob3J0TmFtZSI6bnVsbCwidGxhIjpudWxsfSwic2NvcmUiOnsid2lubmVyIjpudWxsLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfSwiaGFsZlRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH19fSx7InV0Y0RhdGUiOiIyMDI2LTA3LTA0VDE3OjAwOjAwWiIsInN0YXR1cyI6IlRJTUVEIiwiZ3JvdXAiOm51bGwsInN0YWdlIjoiTEFTVF8xNiIsImhvbWVUZWFtIjp7Im5hbWUiOm51bGwsInNob3J0TmFtZSI6bnVsbCwidGxhIjpudWxsfSwiYXdheVRlYW0iOnsibmFtZSI6bnVsbCwic2hvcnROYW1lIjpudWxsLCJ0bGEiOm51bGx9LCJzY29yZSI6eyJ3aW5uZXIiOm51bGwsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9LCJoYWxmVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfX19LHsidXRjRGF0ZSI6IjIwMjYtMDctMDRUMjE6MDA6MDBaIiwic3RhdHVzIjoiVElNRUQiLCJncm91cCI6bnVsbCwic3RhZ2UiOiJMQVNUXzE2IiwiaG9tZVRlYW0iOnsibmFtZSI6bnVsbCwic2hvcnROYW1lIjpudWxsLCJ0bGEiOm51bGx9LCJhd2F5VGVhbSI6eyJuYW1lIjpudWxsLCJzaG9ydE5hbWUiOm51bGwsInRsYSI6bnVsbH0sInNjb3JlIjp7Indpbm5lciI6bnVsbCwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH0sImhhbGZUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNy0wNVQyMDowMDowMFoiLCJzdGF0dXMiOiJUSU1FRCIsImdyb3VwIjpudWxsLCJzdGFnZSI6IkxBU1RfMTYiLCJob21lVGVhbSI6eyJuYW1lIjpudWxsLCJzaG9ydE5hbWUiOm51bGwsInRsYSI6bnVsbH0sImF3YXlUZWFtIjp7Im5hbWUiOm51bGwsInNob3J0TmFtZSI6bnVsbCwidGxhIjpudWxsfSwic2NvcmUiOnsid2lubmVyIjpudWxsLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfSwiaGFsZlRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH19fSx7InV0Y0RhdGUiOiIyMDI2LTA3LTA2VDAwOjAwOjAwWiIsInN0YXR1cyI6IlRJTUVEIiwiZ3JvdXAiOm51bGwsInN0YWdlIjoiTEFTVF8xNiIsImhvbWVUZWFtIjp7Im5hbWUiOm51bGwsInNob3J0TmFtZSI6bnVsbCwidGxhIjpudWxsfSwiYXdheVRlYW0iOnsibmFtZSI6bnVsbCwic2hvcnROYW1lIjpudWxsLCJ0bGEiOm51bGx9LCJzY29yZSI6eyJ3aW5uZXIiOm51bGwsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9LCJoYWxmVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfX19LHsidXRjRGF0ZSI6IjIwMjYtMDctMDZUMTk6MDA6MDBaIiwic3RhdHVzIjoiVElNRUQiLCJncm91cCI6bnVsbCwic3RhZ2UiOiJMQVNUXzE2IiwiaG9tZVRlYW0iOnsibmFtZSI6bnVsbCwic2hvcnROYW1lIjpudWxsLCJ0bGEiOm51bGx9LCJhd2F5VGVhbSI6eyJuYW1lIjpudWxsLCJzaG9ydE5hbWUiOm51bGwsInRsYSI6bnVsbH0sInNjb3JlIjp7Indpbm5lciI6bnVsbCwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH0sImhhbGZUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNy0wN1QwMDowMDowMFoiLCJzdGF0dXMiOiJUSU1FRCIsImdyb3VwIjpudWxsLCJzdGFnZSI6IkxBU1RfMTYiLCJob21lVGVhbSI6eyJuYW1lIjpudWxsLCJzaG9ydE5hbWUiOm51bGwsInRsYSI6bnVsbH0sImF3YXlUZWFtIjp7Im5hbWUiOm51bGwsInNob3J0TmFtZSI6bnVsbCwidGxhIjpudWxsfSwic2NvcmUiOnsid2lubmVyIjpudWxsLCJkdXJhdGlvbiI6IlJFR1VMQVIiLCJmdWxsVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfSwiaGFsZlRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH19fSx7InV0Y0RhdGUiOiIyMDI2LTA3LTA3VDE2OjAwOjAwWiIsInN0YXR1cyI6IlRJTUVEIiwiZ3JvdXAiOm51bGwsInN0YWdlIjoiTEFTVF8xNiIsImhvbWVUZWFtIjp7Im5hbWUiOm51bGwsInNob3J0TmFtZSI6bnVsbCwidGxhIjpudWxsfSwiYXdheVRlYW0iOnsibmFtZSI6bnVsbCwic2hvcnROYW1lIjpudWxsLCJ0bGEiOm51bGx9LCJzY29yZSI6eyJ3aW5uZXIiOm51bGwsImR1cmF0aW9uIjoiUkVHVUxBUiIsImZ1bGxUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9LCJoYWxmVGltZSI6eyJob21lIjpudWxsLCJhd2F5IjpudWxsfX19LHsidXRjRGF0ZSI6IjIwMjYtMDctMDdUMjA6MDA6MDBaIiwic3RhdHVzIjoiVElNRUQiLCJncm91cCI6bnVsbCwic3RhZ2UiOiJMQVNUXzE2IiwiaG9tZVRlYW0iOnsibmFtZSI6bnVsbCwic2hvcnROYW1lIjpudWxsLCJ0bGEiOm51bGx9LCJhd2F5VGVhbSI6eyJuYW1lIjpudWxsLCJzaG9ydE5hbWUiOm51bGwsInRsYSI6bnVsbH0sInNjb3JlIjp7Indpbm5lciI6bnVsbCwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH0sImhhbGZUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNy0wOVQyMDowMDowMFoiLCJzdGF0dXMiOiJUSU1FRCIsImdyb3VwIjpudWxsLCJzdGFnZSI6IlFVQVJURVJfRklOQUxTIiwiaG9tZVRlYW0iOnsibmFtZSI6bnVsbCwic2hvcnROYW1lIjpudWxsLCJ0bGEiOm51bGx9LCJhd2F5VGVhbSI6eyJuYW1lIjpudWxsLCJzaG9ydE5hbWUiOm51bGwsInRsYSI6bnVsbH0sInNjb3JlIjp7Indpbm5lciI6bnVsbCwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH0sImhhbGZUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNy0xMFQxOTowMDowMFoiLCJzdGF0dXMiOiJUSU1FRCIsImdyb3VwIjpudWxsLCJzdGFnZSI6IlFVQVJURVJfRklOQUxTIiwiaG9tZVRlYW0iOnsibmFtZSI6bnVsbCwic2hvcnROYW1lIjpudWxsLCJ0bGEiOm51bGx9LCJhd2F5VGVhbSI6eyJuYW1lIjpudWxsLCJzaG9ydE5hbWUiOm51bGwsInRsYSI6bnVsbH0sInNjb3JlIjp7Indpbm5lciI6bnVsbCwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH0sImhhbGZUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNy0xMVQyMTowMDowMFoiLCJzdGF0dXMiOiJUSU1FRCIsImdyb3VwIjpudWxsLCJzdGFnZSI6IlFVQVJURVJfRklOQUxTIiwiaG9tZVRlYW0iOnsibmFtZSI6bnVsbCwic2hvcnROYW1lIjpudWxsLCJ0bGEiOm51bGx9LCJhd2F5VGVhbSI6eyJuYW1lIjpudWxsLCJzaG9ydE5hbWUiOm51bGwsInRsYSI6bnVsbH0sInNjb3JlIjp7Indpbm5lciI6bnVsbCwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH0sImhhbGZUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNy0xMlQwMTowMDowMFoiLCJzdGF0dXMiOiJUSU1FRCIsImdyb3VwIjpudWxsLCJzdGFnZSI6IlFVQVJURVJfRklOQUxTIiwiaG9tZVRlYW0iOnsibmFtZSI6bnVsbCwic2hvcnROYW1lIjpudWxsLCJ0bGEiOm51bGx9LCJhd2F5VGVhbSI6eyJuYW1lIjpudWxsLCJzaG9ydE5hbWUiOm51bGwsInRsYSI6bnVsbH0sInNjb3JlIjp7Indpbm5lciI6bnVsbCwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH0sImhhbGZUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNy0xNFQxOTowMDowMFoiLCJzdGF0dXMiOiJUSU1FRCIsImdyb3VwIjpudWxsLCJzdGFnZSI6IlNFTUlfRklOQUxTIiwiaG9tZVRlYW0iOnsibmFtZSI6bnVsbCwic2hvcnROYW1lIjpudWxsLCJ0bGEiOm51bGx9LCJhd2F5VGVhbSI6eyJuYW1lIjpudWxsLCJzaG9ydE5hbWUiOm51bGwsInRsYSI6bnVsbH0sInNjb3JlIjp7Indpbm5lciI6bnVsbCwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH0sImhhbGZUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNy0xNVQxOTowMDowMFoiLCJzdGF0dXMiOiJUSU1FRCIsImdyb3VwIjpudWxsLCJzdGFnZSI6IlNFTUlfRklOQUxTIiwiaG9tZVRlYW0iOnsibmFtZSI6bnVsbCwic2hvcnROYW1lIjpudWxsLCJ0bGEiOm51bGx9LCJhd2F5VGVhbSI6eyJuYW1lIjpudWxsLCJzaG9ydE5hbWUiOm51bGwsInRsYSI6bnVsbH0sInNjb3JlIjp7Indpbm5lciI6bnVsbCwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH0sImhhbGZUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNy0xOFQyMTowMDowMFoiLCJzdGF0dXMiOiJUSU1FRCIsImdyb3VwIjpudWxsLCJzdGFnZSI6IlRISVJEX1BMQUNFIiwiaG9tZVRlYW0iOnsibmFtZSI6bnVsbCwic2hvcnROYW1lIjpudWxsLCJ0bGEiOm51bGx9LCJhd2F5VGVhbSI6eyJuYW1lIjpudWxsLCJzaG9ydE5hbWUiOm51bGwsInRsYSI6bnVsbH0sInNjb3JlIjp7Indpbm5lciI6bnVsbCwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH0sImhhbGZUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9fX0seyJ1dGNEYXRlIjoiMjAyNi0wNy0xOVQxOTowMDowMFoiLCJzdGF0dXMiOiJUSU1FRCIsImdyb3VwIjpudWxsLCJzdGFnZSI6IkZJTkFMIiwiaG9tZVRlYW0iOnsibmFtZSI6bnVsbCwic2hvcnROYW1lIjpudWxsLCJ0bGEiOm51bGx9LCJhd2F5VGVhbSI6eyJuYW1lIjpudWxsLCJzaG9ydE5hbWUiOm51bGwsInRsYSI6bnVsbH0sInNjb3JlIjp7Indpbm5lciI6bnVsbCwiZHVyYXRpb24iOiJSRUdVTEFSIiwiZnVsbFRpbWUiOnsiaG9tZSI6bnVsbCwiYXdheSI6bnVsbH0sImhhbGZUaW1lIjp7ImhvbWUiOm51bGwsImF3YXkiOm51bGx9fX1dLCJzdGFuZGluZ3MiOlt7Imdyb3VwIjoiR3JvdXAgQSIsInR5cGUiOiJUT1RBTCIsInRhYmxlIjpbeyJwb3NpdGlvbiI6MSwicG9pbnRzIjo0LCJwbGF5ZWRHYW1lcyI6Miwid29uIjoxLCJkcmF3IjoxLCJsb3N0IjowLCJ0ZWFtIjp7Im5hbWUiOiJNZXhpY28iLCJzaG9ydE5hbWUiOiJNZXhpY28iLCJ0bGEiOiJNRVgifX0seyJwb3NpdGlvbiI6MiwicG9pbnRzIjo0LCJwbGF5ZWRHYW1lcyI6Miwid29uIjoxLCJkcmF3IjoxLCJsb3N0IjowLCJ0ZWFtIjp7Im5hbWUiOiJTb3V0aCBLb3JlYSIsInNob3J0TmFtZSI6IktvcmVhIFJlcHVibGljIiwidGxhIjoiS09SIn19LHsicG9zaXRpb24iOjMsInBvaW50cyI6MSwicGxheWVkR2FtZXMiOjIsIndvbiI6MCwiZHJhdyI6MSwibG9zdCI6MSwidGVhbSI6eyJuYW1lIjoiQ3plY2hpYSIsInNob3J0TmFtZSI6IkN6ZWNoaWEiLCJ0bGEiOiJDWkUifX0seyJwb3NpdGlvbiI6NCwicG9pbnRzIjoxLCJwbGF5ZWRHYW1lcyI6Miwid29uIjowLCJkcmF3IjoxLCJsb3N0IjoxLCJ0ZWFtIjp7Im5hbWUiOiJTb3V0aCBBZnJpY2EiLCJzaG9ydE5hbWUiOiJTb3V0aCBBZnJpY2EiLCJ0bGEiOiJSU0EifX1dfSx7Imdyb3VwIjoiR3JvdXAgQiIsInR5cGUiOiJUT1RBTCIsInRhYmxlIjpbeyJwb3NpdGlvbiI6MSwicG9pbnRzIjo0LCJwbGF5ZWRHYW1lcyI6Miwid29uIjoxLCJkcmF3IjoxLCJsb3N0IjowLCJ0ZWFtIjp7Im5hbWUiOiJDYW5hZGEiLCJzaG9ydE5hbWUiOiJDYW5hZGEiLCJ0bGEiOiJDQU4ifX0seyJwb3NpdGlvbiI6MiwicG9pbnRzIjo0LCJwbGF5ZWRHYW1lcyI6Miwid29uIjoxLCJkcmF3IjoxLCJsb3N0IjowLCJ0ZWFtIjp7Im5hbWUiOiJTd2l0emVybGFuZCIsInNob3J0TmFtZSI6IlN3aXR6ZXJsYW5kIiwidGxhIjoiU1VJIn19LHsicG9zaXRpb24iOjMsInBvaW50cyI6MSwicGxheWVkR2FtZXMiOjIsIndvbiI6MCwiZHJhdyI6MSwibG9zdCI6MSwidGVhbSI6eyJuYW1lIjoiQm9zbmlhLUhlcnplZ292aW5hIiwic2hvcnROYW1lIjoiQm9zbmlhLUguIiwidGxhIjoiQklIIn19LHsicG9zaXRpb24iOjQsInBvaW50cyI6MSwicGxheWVkR2FtZXMiOjIsIndvbiI6MCwiZHJhdyI6MSwibG9zdCI6MSwidGVhbSI6eyJuYW1lIjoiUWF0YXIiLCJzaG9ydE5hbWUiOiJRYXRhciIsInRsYSI6IlFBVCJ9fV19LHsiZ3JvdXAiOiJHcm91cCBDIiwidHlwZSI6IlRPVEFMIiwidGFibGUiOlt7InBvc2l0aW9uIjoxLCJwb2ludHMiOjMsInBsYXllZEdhbWVzIjoxLCJ3b24iOjEsImRyYXciOjAsImxvc3QiOjAsInRlYW0iOnsibmFtZSI6IlNjb3RsYW5kIiwic2hvcnROYW1lIjoiU2NvdGxhbmQiLCJ0bGEiOiJTQ08ifX0seyJwb3NpdGlvbiI6MiwicG9pbnRzIjoxLCJwbGF5ZWRHYW1lcyI6MSwid29uIjowLCJkcmF3IjoxLCJsb3N0IjowLCJ0ZWFtIjp7Im5hbWUiOiJNb3JvY2NvIiwic2hvcnROYW1lIjoiTW9yb2NjbyIsInRsYSI6Ik1BUiJ9fSx7InBvc2l0aW9uIjozLCJwb2ludHMiOjEsInBsYXllZEdhbWVzIjoxLCJ3b24iOjAsImRyYXciOjEsImxvc3QiOjAsInRlYW0iOnsibmFtZSI6IkJyYXppbCIsInNob3J0TmFtZSI6IkJyYXppbCIsInRsYSI6IkJSQSJ9fSx7InBvc2l0aW9uIjo0LCJwb2ludHMiOjAsInBsYXllZEdhbWVzIjoxLCJ3b24iOjAsImRyYXciOjAsImxvc3QiOjEsInRlYW0iOnsibmFtZSI6IkhhaXRpIiwic2hvcnROYW1lIjoiSGFpdGkiLCJ0bGEiOiJIQUkifX1dfSx7Imdyb3VwIjoiR3JvdXAgRCIsInR5cGUiOiJUT1RBTCIsInRhYmxlIjpbeyJwb3NpdGlvbiI6MSwicG9pbnRzIjozLCJwbGF5ZWRHYW1lcyI6MSwid29uIjoxLCJkcmF3IjowLCJsb3N0IjowLCJ0ZWFtIjp7Im5hbWUiOiJVbml0ZWQgU3RhdGVzIiwic2hvcnROYW1lIjoiVVNBIiwidGxhIjoiVVNBIn19LHsicG9zaXRpb24iOjIsInBvaW50cyI6MywicGxheWVkR2FtZXMiOjEsIndvbiI6MSwiZHJhdyI6MCwibG9zdCI6MCwidGVhbSI6eyJuYW1lIjoiQXVzdHJhbGlhIiwic2hvcnROYW1lIjoiQXVzdHJhbGlhIiwidGxhIjoiQVVTIn19LHsicG9zaXRpb24iOjMsInBvaW50cyI6MCwicGxheWVkR2FtZXMiOjEsIndvbiI6MCwiZHJhdyI6MCwibG9zdCI6MSwidGVhbSI6eyJuYW1lIjoiVHVya2V5Iiwic2hvcnROYW1lIjoiVHVya2V5IiwidGxhIjoiVFVSIn19LHsicG9zaXRpb24iOjQsInBvaW50cyI6MCwicGxheWVkR2FtZXMiOjEsIndvbiI6MCwiZHJhdyI6MCwibG9zdCI6MSwidGVhbSI6eyJuYW1lIjoiUGFyYWd1YXkiLCJzaG9ydE5hbWUiOiJQYXJhZ3VheSIsInRsYSI6IlBBUiJ9fV19LHsiZ3JvdXAiOiJHcm91cCBFIiwidHlwZSI6IlRPVEFMIiwidGFibGUiOlt7InBvc2l0aW9uIjoxLCJwb2ludHMiOjMsInBsYXllZEdhbWVzIjoxLCJ3b24iOjEsImRyYXciOjAsImxvc3QiOjAsInRlYW0iOnsibmFtZSI6Ikdlcm1hbnkiLCJzaG9ydE5hbWUiOiJHZXJtYW55IiwidGxhIjoiR0VSIn19LHsicG9zaXRpb24iOjIsInBvaW50cyI6MywicGxheWVkR2FtZXMiOjEsIndvbiI6MSwiZHJhdyI6MCwibG9zdCI6MCwidGVhbSI6eyJuYW1lIjoiSXZvcnkgQ29hc3QiLCJzaG9ydE5hbWUiOiJJdm9yeSBDb2FzdCIsInRsYSI6IkNJViJ9fSx7InBvc2l0aW9uIjozLCJwb2ludHMiOjAsInBsYXllZEdhbWVzIjoxLCJ3b24iOjAsImRyYXciOjAsImxvc3QiOjEsInRlYW0iOnsibmFtZSI6IkVjdWFkb3IiLCJzaG9ydE5hbWUiOiJFY3VhZG9yIiwidGxhIjoiRUNVIn19LHsicG9zaXRpb24iOjQsInBvaW50cyI6MCwicGxheWVkR2FtZXMiOjEsIndvbiI6MCwiZHJhdyI6MCwibG9zdCI6MSwidGVhbSI6eyJuYW1lIjoiQ3VyYcOnYW8iLCJzaG9ydE5hbWUiOiJDdXJhw6dhbyIsInRsYSI6IkNVVyJ9fV19LHsiZ3JvdXAiOiJHcm91cCBGIiwidHlwZSI6IlRPVEFMIiwidGFibGUiOlt7InBvc2l0aW9uIjoxLCJwb2ludHMiOjMsInBsYXllZEdhbWVzIjoxLCJ3b24iOjEsImRyYXciOjAsImxvc3QiOjAsInRlYW0iOnsibmFtZSI6IlN3ZWRlbiIsInNob3J0TmFtZSI6IlN3ZWRlbiIsInRsYSI6IlNXRSJ9fSx7InBvc2l0aW9uIjoyLCJwb2ludHMiOjEsInBsYXllZEdhbWVzIjoxLCJ3b24iOjAsImRyYXciOjEsImxvc3QiOjAsInRlYW0iOnsibmFtZSI6IkphcGFuIiwic2hvcnROYW1lIjoiSmFwYW4iLCJ0bGEiOiJKUE4ifX0seyJwb3NpdGlvbiI6MiwicG9pbnRzIjoxLCJwbGF5ZWRHYW1lcyI6MSwid29uIjowLCJkcmF3IjoxLCJsb3N0IjowLCJ0ZWFtIjp7Im5hbWUiOiJOZXRoZXJsYW5kcyIsInNob3J0TmFtZSI6Ik5ldGhlcmxhbmRzIiwidGxhIjoiTkVEIn19LHsicG9zaXRpb24iOjQsInBvaW50cyI6MCwicGxheWVkR2FtZXMiOjEsIndvbiI6MCwiZHJhdyI6MCwibG9zdCI6MSwidGVhbSI6eyJuYW1lIjoiVHVuaXNpYSIsInNob3J0TmFtZSI6IlR1bmlzaWEiLCJ0bGEiOiJUVU4ifX1dfSx7Imdyb3VwIjoiR3JvdXAgRyIsInR5cGUiOiJUT1RBTCIsInRhYmxlIjpbeyJwb3NpdGlvbiI6MSwicG9pbnRzIjoxLCJwbGF5ZWRHYW1lcyI6MSwid29uIjowLCJkcmF3IjoxLCJsb3N0IjowLCJ0ZWFtIjp7Im5hbWUiOiJOZXcgWmVhbGFuZCIsInNob3J0TmFtZSI6Ik5ldyBaZWFsYW5kIiwidGxhIjoiTlpMIn19LHsicG9zaXRpb24iOjIsInBvaW50cyI6MSwicGxheWVkR2FtZXMiOjEsIndvbiI6MCwiZHJhdyI6MSwibG9zdCI6MCwidGVhbSI6eyJuYW1lIjoiSXJhbiIsInNob3J0TmFtZSI6IklyYW4iLCJ0bGEiOiJJUk4ifX0seyJwb3NpdGlvbiI6MywicG9pbnRzIjoxLCJwbGF5ZWRHYW1lcyI6MSwid29uIjowLCJkcmF3IjoxLCJsb3N0IjowLCJ0ZWFtIjp7Im5hbWUiOiJCZWxnaXVtIiwic2hvcnROYW1lIjoiQmVsZ2l1bSIsInRsYSI6IkJFTCJ9fSx7InBvc2l0aW9uIjo0LCJwb2ludHMiOjEsInBsYXllZEdhbWVzIjoxLCJ3b24iOjAsImRyYXciOjEsImxvc3QiOjAsInRlYW0iOnsibmFtZSI6IkVneXB0Iiwic2hvcnROYW1lIjoiRWd5cHQiLCJ0bGEiOiJFR1kifX1dfSx7Imdyb3VwIjoiR3JvdXAgSCIsInR5cGUiOiJUT1RBTCIsInRhYmxlIjpbeyJwb3NpdGlvbiI6MSwicG9pbnRzIjoxLCJwbGF5ZWRHYW1lcyI6MSwid29uIjowLCJkcmF3IjoxLCJsb3N0IjowLCJ0ZWFtIjp7Im5hbWUiOiJVcnVndWF5Iiwic2hvcnROYW1lIjoiVXJ1Z3VheSIsInRsYSI6IlVSVSJ9fSx7InBvc2l0aW9uIjoyLCJwb2ludHMiOjEsInBsYXllZEdhbWVzIjoxLCJ3b24iOjAsImRyYXciOjEsImxvc3QiOjAsInRlYW0iOnsibmFtZSI6IlNhdWRpIEFyYWJpYSIsInNob3J0TmFtZSI6IlNhdWRpIEFyYWJpYSIsInRsYSI6IktTQSJ9fSx7InBvc2l0aW9uIjozLCJwb2ludHMiOjEsInBsYXllZEdhbWVzIjoxLCJ3b24iOjAsImRyYXciOjEsImxvc3QiOjAsInRlYW0iOnsibmFtZSI6IlNwYWluIiwic2hvcnROYW1lIjoiU3BhaW4iLCJ0bGEiOiJFU1AifX0seyJwb3NpdGlvbiI6NCwicG9pbnRzIjoxLCJwbGF5ZWRHYW1lcyI6MSwid29uIjowLCJkcmF3IjoxLCJsb3N0IjowLCJ0ZWFtIjp7Im5hbWUiOiJDYXBlIFZlcmRlIElzbGFuZHMiLCJzaG9ydE5hbWUiOiJDYXBlIFZlcmRlIiwidGxhIjoiQ1BWIn19XX0seyJncm91cCI6Ikdyb3VwIEkiLCJ0eXBlIjoiVE9UQUwiLCJ0YWJsZSI6W3sicG9zaXRpb24iOjEsInBvaW50cyI6MywicGxheWVkR2FtZXMiOjEsIndvbiI6MSwiZHJhdyI6MCwibG9zdCI6MCwidGVhbSI6eyJuYW1lIjoiTm9yd2F5Iiwic2hvcnROYW1lIjoiTm9yd2F5IiwidGxhIjoiTk9SIn19LHsicG9zaXRpb24iOjIsInBvaW50cyI6MywicGxheWVkR2FtZXMiOjEsIndvbiI6MSwiZHJhdyI6MCwibG9zdCI6MCwidGVhbSI6eyJuYW1lIjoiRnJhbmNlIiwic2hvcnROYW1lIjoiRnJhbmNlIiwidGxhIjoiRlJBIn19LHsicG9zaXRpb24iOjMsInBvaW50cyI6MCwicGxheWVkR2FtZXMiOjEsIndvbiI6MCwiZHJhdyI6MCwibG9zdCI6MSwidGVhbSI6eyJuYW1lIjoiU2VuZWdhbCIsInNob3J0TmFtZSI6IlNlbmVnYWwiLCJ0bGEiOiJTRU4ifX0seyJwb3NpdGlvbiI6NCwicG9pbnRzIjowLCJwbGF5ZWRHYW1lcyI6MSwid29uIjowLCJkcmF3IjowLCJsb3N0IjoxLCJ0ZWFtIjp7Im5hbWUiOiJJcmFxIiwic2hvcnROYW1lIjoiSXJhcSIsInRsYSI6IklSUSJ9fV19LHsiZ3JvdXAiOiJHcm91cCBKIiwidHlwZSI6IlRPVEFMIiwidGFibGUiOlt7InBvc2l0aW9uIjoxLCJwb2ludHMiOjMsInBsYXllZEdhbWVzIjoxLCJ3b24iOjEsImRyYXciOjAsImxvc3QiOjAsInRlYW0iOnsibmFtZSI6IkFyZ2VudGluYSIsInNob3J0TmFtZSI6IkFyZ2VudGluYSIsInRsYSI6IkFSRyJ9fSx7InBvc2l0aW9uIjoyLCJwb2ludHMiOjMsInBsYXllZEdhbWVzIjoxLCJ3b24iOjEsImRyYXciOjAsImxvc3QiOjAsInRlYW0iOnsibmFtZSI6IkF1c3RyaWEiLCJzaG9ydE5hbWUiOiJBdXN0cmlhIiwidGxhIjoiQVVUIn19LHsicG9zaXRpb24iOjMsInBvaW50cyI6MCwicGxheWVkR2FtZXMiOjEsIndvbiI6MCwiZHJhdyI6MCwibG9zdCI6MSwidGVhbSI6eyJuYW1lIjoiSm9yZGFuIiwic2hvcnROYW1lIjoiSm9yZGFuIiwidGxhIjoiSk9SIn19LHsicG9zaXRpb24iOjQsInBvaW50cyI6MCwicGxheWVkR2FtZXMiOjEsIndvbiI6MCwiZHJhdyI6MCwibG9zdCI6MSwidGVhbSI6eyJuYW1lIjoiQWxnZXJpYSIsInNob3J0TmFtZSI6IkFsZ2VyaWEiLCJ0bGEiOiJBTEcifX1dfSx7Imdyb3VwIjoiR3JvdXAgSyIsInR5cGUiOiJUT1RBTCIsInRhYmxlIjpbeyJwb3NpdGlvbiI6MSwicG9pbnRzIjozLCJwbGF5ZWRHYW1lcyI6MSwid29uIjoxLCJkcmF3IjowLCJsb3N0IjowLCJ0ZWFtIjp7Im5hbWUiOiJDb2xvbWJpYSIsInNob3J0TmFtZSI6IkNvbG9tYmlhIiwidGxhIjoiQ09MIn19LHsicG9zaXRpb24iOjIsInBvaW50cyI6MSwicGxheWVkR2FtZXMiOjEsIndvbiI6MCwiZHJhdyI6MSwibG9zdCI6MCwidGVhbSI6eyJuYW1lIjoiQ29uZ28gRFIiLCJzaG9ydE5hbWUiOiJDb25nbyBEUiIsInRsYSI6IkNPRCJ9fSx7InBvc2l0aW9uIjoyLCJwb2ludHMiOjEsInBsYXllZEdhbWVzIjoxLCJ3b24iOjAsImRyYXciOjEsImxvc3QiOjAsInRlYW0iOnsibmFtZSI6IlBvcnR1Z2FsIiwic2hvcnROYW1lIjoiUG9ydHVnYWwiLCJ0bGEiOiJQT1IifX0seyJwb3NpdGlvbiI6NCwicG9pbnRzIjowLCJwbGF5ZWRHYW1lcyI6MSwid29uIjowLCJkcmF3IjowLCJsb3N0IjoxLCJ0ZWFtIjp7Im5hbWUiOiJVemJla2lzdGFuIiwic2hvcnROYW1lIjoiVXpiZWtpc3RhbiIsInRsYSI6IlVaQiJ9fV19LHsiZ3JvdXAiOiJHcm91cCBMIiwidHlwZSI6IlRPVEFMIiwidGFibGUiOlt7InBvc2l0aW9uIjoxLCJwb2ludHMiOjMsInBsYXllZEdhbWVzIjoxLCJ3b24iOjEsImRyYXciOjAsImxvc3QiOjAsInRlYW0iOnsibmFtZSI6IkVuZ2xhbmQiLCJzaG9ydE5hbWUiOiJFbmdsYW5kIiwidGxhIjoiRU5HIn19LHsicG9zaXRpb24iOjIsInBvaW50cyI6MywicGxheWVkR2FtZXMiOjEsIndvbiI6MSwiZHJhdyI6MCwibG9zdCI6MCwidGVhbSI6eyJuYW1lIjoiR2hhbmEiLCJzaG9ydE5hbWUiOiJHaGFuYSIsInRsYSI6IkdIQSJ9fSx7InBvc2l0aW9uIjozLCJwb2ludHMiOjAsInBsYXllZEdhbWVzIjoxLCJ3b24iOjAsImRyYXciOjAsImxvc3QiOjEsInRlYW0iOnsibmFtZSI6IlBhbmFtYSIsInNob3J0TmFtZSI6IlBhbmFtYSIsInRsYSI6IlBBTiJ9fSx7InBvc2l0aW9uIjo0LCJwb2ludHMiOjAsInBsYXllZEdhbWVzIjoxLCJ3b24iOjAsImRyYXciOjAsImxvc3QiOjEsInRlYW0iOnsibmFtZSI6IkNyb2F0aWEiLCJzaG9ydE5hbWUiOiJDcm9hdGlhIiwidGxhIjoiQ1JPIn19XX1dLCJzY29yZXJzIjpbeyJnb2FscyI6MywicGxheWVyIjp7Im5hbWUiOiJMaW9uZWwgTWVzc2kifSwidGVhbSI6eyJuYW1lIjoiQXJnZW50aW5hIiwic2hvcnROYW1lIjoiQXJnZW50aW5hIn19LHsiZ29hbHMiOjMsInBsYXllciI6eyJuYW1lIjoiSm9uYXRoYW4gRGF2aWQifSwidGVhbSI6eyJuYW1lIjoiQ2FuYWRhIiwic2hvcnROYW1lIjoiQ2FuYWRhIn19LHsiZ29hbHMiOjIsInBsYXllciI6eyJuYW1lIjoiQ3lsZSBMYXJpbiJ9LCJ0ZWFtIjp7Im5hbWUiOiJDYW5hZGEiLCJzaG9ydE5hbWUiOiJDYW5hZGEifX0seyJnb2FscyI6MiwicGxheWVyIjp7Im5hbWUiOiJGb2xhcmluIEJhbG9ndW4ifSwidGVhbSI6eyJuYW1lIjoiVW5pdGVkIFN0YXRlcyIsInNob3J0TmFtZSI6IlVTQSJ9fSx7ImdvYWxzIjoyLCJwbGF5ZXIiOnsibmFtZSI6IkthaSBIYXZlcnR6In0sInRlYW0iOnsibmFtZSI6Ikdlcm1hbnkiLCJzaG9ydE5hbWUiOiJHZXJtYW55In19LHsiZ29hbHMiOjIsInBsYXllciI6eyJuYW1lIjoiWWFzaW4gQXlhcmkifSwidGVhbSI6eyJuYW1lIjoiU3dlZGVuIiwic2hvcnROYW1lIjoiU3dlZGVuIn19LHsiZ29hbHMiOjIsInBsYXllciI6eyJuYW1lIjoiRWxpamFoIEp1c3QifSwidGVhbSI6eyJuYW1lIjoiTmV3IFplYWxhbmQiLCJzaG9ydE5hbWUiOiJOZXcgWmVhbGFuZCJ9fSx7ImdvYWxzIjoyLCJwbGF5ZXIiOnsibmFtZSI6Ikt5bGlhbiBNYmFwcMOpIn0sInRlYW0iOnsibmFtZSI6IkZyYW5jZSIsInNob3J0TmFtZSI6IkZyYW5jZSJ9fSx7ImdvYWxzIjoyLCJwbGF5ZXIiOnsibmFtZSI6IkVybGluZyBIYWFsYW5kIn0sInRlYW0iOnsibmFtZSI6Ik5vcndheSIsInNob3J0TmFtZSI6Ik5vcndheSJ9fSx7ImdvYWxzIjoyLCJwbGF5ZXIiOnsibmFtZSI6IkhhcnJ5IEthbmUifSwidGVhbSI6eyJuYW1lIjoiRW5nbGFuZCIsInNob3J0TmFtZSI6IkVuZ2xhbmQifX0seyJnb2FscyI6MiwicGxheWVyIjp7Im5hbWUiOiJKb2hhbiBNYW56YW1iaSJ9LCJ0ZWFtIjp7Im5hbWUiOiJTd2l0emVybGFuZCIsInNob3J0TmFtZSI6IlN3aXR6ZXJsYW5kIn19LHsiZ29hbHMiOjEsInBsYXllciI6eyJuYW1lIjoiSnVsacOhbiBRdWnDsW9uZXMifSwidGVhbSI6eyJuYW1lIjoiTWV4aWNvIiwic2hvcnROYW1lIjoiTWV4aWNvIn19LHsiZ29hbHMiOjEsInBsYXllciI6eyJuYW1lIjoiUmHDumwgSmltw6luZXoifSwidGVhbSI6eyJuYW1lIjoiTWV4aWNvIiwic2hvcnROYW1lIjoiTWV4aWNvIn19LHsiZ29hbHMiOjEsInBsYXllciI6eyJuYW1lIjoiTGFkaXNsYXYgS3JlasSNw60ifSwidGVhbSI6eyJuYW1lIjoiQ3plY2hpYSIsInNob3J0TmFtZSI6IkN6ZWNoaWEifX0seyJnb2FscyI6MSwicGxheWVyIjp7Im5hbWUiOiJJbi1iZW9tIEh3YW5nIn0sInRlYW0iOnsibmFtZSI6IlNvdXRoIEtvcmVhIiwic2hvcnROYW1lIjoiS29yZWEgUmVwdWJsaWMifX1dLCJhcnRpY2xlcyI6W119"));</script>
 </head>
 <body>
-
-<script>
-const CONFIG = {
-  BASE_URL: 'https://api.football-data.org/v4',
-  COMPETITION: 'WC',
-  REFRESH_INTERVAL: 60000,
-};
-</script>
 
 <header class="header">
   <div class="header-inner">
@@ -186,11 +158,10 @@ const CONFIG = {
         <div class="brand-sub">USA · Canada · Mexico · June 11 – July 19, 2026</div>
       </div>
     </div>
-    <div class="header-right">
-      <span class="live-badge" id="live-badge">● LIVE</span>
-      <span class="date-badge" id="js-date"></span>
-      <span class="last-update" id="last-update"></span>
-      <button class="refresh-btn" onclick="refreshAll()">↻ Refresh</button>
+    <div class="hright">
+      <span class="live-badge">● LIVE</span>
+      <span class="upd" id="js-upd"></span>
+      <button class="rbtn" onclick="loadAll()">↻ Refresh</button>
     </div>
   </div>
   <div class="nav-tabs">
@@ -199,230 +170,165 @@ const CONFIG = {
     <button class="ntab" data-tab="favorites">🏅 Favorites</button>
     <button class="ntab" data-tab="venues">📍 Venues</button>
     <button class="ntab" data-tab="news">📰 News</button>
-    <button class="ntab" data-tab="golden-boot">⚽ Golden Boot</button>
+    <button class="ntab" data-tab="boot">⚽ Golden Boot</button>
   </div>
 </header>
 
-<!-- TICKER -->
 <div class="ticker-wrap">
-  <div class="ticker-track" id="ticker-track">
-    <span class="ticker-label">SCORES</span>
-    <span class="ticker-loading">Loading live scores…</span>
-    <span class="ticker-label">SCORES</span>
-    <span class="ticker-loading">Loading live scores…</span>
+  <div class="ticker-track" id="ticker">
+    <span class="ticker-lbl">SCORES</span>
+    <span style="color:rgba(255,255,255,.5);font-size:11px;padding:0 16px">Loading scores…</span>
+    <span class="ticker-lbl">SCORES</span>
+    <span style="color:rgba(255,255,255,.5);font-size:11px;padding:0 16px">Loading scores…</span>
   </div>
 </div>
 
 <main class="main">
 
-<!-- TODAY TAB -->
 <div class="tab-section active" id="tab-today">
   <div class="grid3">
     <div class="col">
       <div class="panel">
         <div class="ph">
-          <div class="ph-title">📅 Today's fixtures</div>
-          <span class="ph-badge badge-live" id="today-badge">Loading…</span>
+          <div class="pht">📅 Today</div>
+          <span class="pbadge pb-live" id="today-badge">—</span>
         </div>
-        <div style="padding:8px 14px;background:rgba(210,153,34,0.1);border-bottom:0.5px solid rgba(210,153,34,0.3);display:flex;align-items:flex-start;gap:8px">
-  <span style="font-size:14px;flex-shrink:0">⚠️</span>
-  <div style="font-size:10px;color:var(--yellow);line-height:1.6">
-    <strong style="font-weight:600">Scores may be delayed</strong> — live data from football-data.org can lag 15–60 min after a match ends.
-    Click any match row to view the live score on FIFA.com.
-  </div>
-</div>
-<div id="today-matches"><div class="loading-msg"><div class="spinner-wrap"><div class="spinner"></div>Loading fixtures…</div></div></div>
+        <div class="disc">⚠️ <span>Scores may lag 15–60 min. Click any match to view live on FIFA.com.</span></div>
+        <div id="today-body"><div class="spin-wrap"><div class="spinner"></div>Loading…</div></div>
       </div>
     </div>
     <div class="col">
       <div class="panel">
-        <div class="ph"><div class="ph-title">📅 Upcoming fixtures</div></div>
-        <div id="upcoming-matches"><div class="loading-msg"><div class="spinner-wrap"><div class="spinner"></div>Loading…</div></div></div>
+        <div class="ph"><div class="pht">📅 Upcoming</div></div>
+        <div id="upcoming-body"><div class="spin-wrap"><div class="spinner"></div>Loading…</div></div>
       </div>
     </div>
     <div class="col">
       <div class="panel">
         <div class="ph">
-          <div class="ph-title">📰 Latest news</div>
-          <span class="ph-badge badge-blue" id="news-badge">Live</span>
+          <div class="pht">📰 Latest news</div>
+          <span class="pbadge pb-blue" id="news-badge">—</span>
         </div>
-        <div id="today-news-body"><div class="loading-msg"><div class="spinner-wrap"><div class="spinner"></div>Loading news…</div></div></div>
+        <div id="news-today-body"><div class="spin-wrap"><div class="spinner"></div>Loading…</div></div>
       </div>
     </div>
   </div>
-
-  <!-- VISUAL BRACKET -->
-  <div class="panel" style="margin-top:14px;overflow:hidden">
+  <div class="panel" style="margin-top:12px">
     <div class="ph">
-      <div class="ph-title">🏆 Tournament bracket · projected from current standings</div>
-      <span class="ph-badge badge-blue" id="bracket-md">Group stage</span>
+      <div class="pht">🏆 Bracket · projected</div>
+      <span class="pbadge pb-blue" id="bracket-badge">Group stage</span>
     </div>
     <div style="padding:10px;overflow-x:auto">
-      <div style="display:flex;gap:0;min-width:900px" id="bracket-rounds">
-
-        <div style="flex-shrink:0">
-          <div class="bracket-rnd-hdr">Groups</div>
-          <div id="br-groups" style="display:flex;flex-direction:column;gap:3px;padding:0 4px"></div>
-        </div>
-
-        <div style="flex-shrink:0">
-          <div class="bracket-rnd-hdr">Round of 32</div>
-          <div id="br-r32" style="display:flex;flex-direction:column;gap:3px;padding:0 4px"></div>
-        </div>
-
-        <div style="flex-shrink:0">
-          <div class="bracket-rnd-hdr">Round of 16</div>
-          <div id="br-r16" style="display:flex;flex-direction:column;gap:3px;padding:0 4px"></div>
-        </div>
-
-        <div style="flex-shrink:0">
-          <div class="bracket-rnd-hdr">Quarterfinals</div>
-          <div id="br-qf" style="display:flex;flex-direction:column;gap:3px;padding:0 4px"></div>
-        </div>
-
-        <div style="flex-shrink:0">
-          <div class="bracket-rnd-hdr">Semifinals</div>
-          <div id="br-sf" style="display:flex;flex-direction:column;gap:3px;padding:0 4px"></div>
-        </div>
-
-        <div style="flex-shrink:0">
-          <div class="bracket-rnd-hdr" style="color:var(--gold)">Final · Jul 19</div>
-          <div id="br-final" style="display:flex;flex-direction:column;gap:3px;padding:0 4px"></div>
-        </div>
-
-      </div>
+      <div style="display:flex;gap:0;min-width:860px" id="bracket-wrap"></div>
     </div>
-    <div style="padding:6px 10px 8px;display:flex;gap:14px;font-size:10px;color:var(--text3);border-top:0.5px solid var(--border)">
-      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:rgba(63,185,80,0.2);border:1px solid var(--green);display:inline-block"></span>Group winner</span>
-      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:rgba(88,166,255,0.2);border:1px solid var(--blue);display:inline-block"></span>Runner-up</span>
-      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--bg3);border:1px solid var(--border2);display:inline-block"></span>TBD</span>
-      <span style="margin-left:auto;color:var(--text3)">Projected · updates with standings</span>
+    <div style="padding:5px 10px 8px;display:flex;gap:12px;font-size:10px;color:var(--text3);border-top:0.5px solid var(--border)">
+      <span style="border-left:2px solid var(--green);padding-left:5px">Group winner</span>
+      <span style="border-left:2px solid var(--blue);padding-left:5px">Runner-up</span>
+      <span style="border-left:2px solid var(--border2);padding-left:5px">TBD</span>
     </div>
   </div>
 </div>
 
-<!-- STANDINGS TAB -->
 <div class="tab-section" id="tab-standings">
-  <div id="standings-grid" class="grid4">
-    <div class="panel"><div class="loading-msg"><div class="spinner-wrap"><div class="spinner"></div>Loading standings…</div></div></div>
+  <div class="grid4" id="standings-grid">
+    <div class="panel"><div class="spin-wrap"><div class="spinner"></div>Loading…</div></div>
   </div>
-  <div style="margin-top:12px;font-size:11px;color:var(--text3);display:flex;gap:16px">
-    <span style="border-left:2px solid var(--blue);padding-left:6px">Automatic qualification (top 2)</span>
-    <span style="border-left:2px solid var(--green);padding-left:6px">Likely qualify</span>
-    <span style="border-left:2px solid var(--yellow);padding-left:6px">Bubble (best 3rd)</span>
+  <div style="margin-top:10px;font-size:11px;color:var(--text3);display:flex;gap:14px">
+    <span style="border-left:2px solid var(--blue);padding-left:5px">Auto qualify (top 2)</span>
+    <span style="border-left:2px solid var(--green);padding-left:5px">Likely qualify</span>
+    <span style="border-left:2px solid var(--yellow);padding-left:5px">Bubble (best 3rd)</span>
   </div>
 </div>
 
-<!-- FAVORITES TAB -->
 <div class="tab-section" id="tab-favorites">
   <div class="grid2">
     <div class="panel">
-      <div class="ph"><div class="ph-title">🏆 To win the World Cup · betting odds</div><span class="ph-badge badge-blue">As of June 18</span></div>
-      <div class="fav-row"><span style="font-size:12px;font-weight:700;color:var(--gold);width:20px;text-align:center">1</span><div class="fav-flag">🇫🇷</div><div style="flex:1"><div class="fav-team-name">France</div><div style="font-size:10px;color:var(--text3)">Co-favorite · Mbappé 2 goals in opener</div></div><div class="fav-odds">+450</div><div class="fav-bar-wrap"><div class="fav-bar" style="width:85%"></div></div></div>
-      <div class="fav-row"><span style="font-size:12px;font-weight:700;color:var(--gold);width:20px;text-align:center">2</span><div class="fav-flag">🇪🇸</div><div style="flex:1"><div class="fav-team-name">Spain</div><div style="font-size:10px;color:var(--text3)">Co-favorite · Held to 0–0 by Cape Verde</div></div><div class="fav-odds">+500</div><div class="fav-bar-wrap"><div class="fav-bar" style="width:80%"></div></div></div>
-      <div class="fav-row"><span style="font-size:12px;font-weight:700;color:silver;width:20px;text-align:center">3</span><div class="fav-flag">🇦🇷</div><div style="flex:1"><div class="fav-team-name">Argentina</div><div style="font-size:10px;color:var(--text3)">Defending champion · Messi hat trick MD1</div></div><div class="fav-odds">+550</div><div class="fav-bar-wrap"><div class="fav-bar" style="width:74%"></div></div></div>
-      <div class="fav-row"><span style="font-size:12px;font-weight:700;width:20px;color:var(--text3);text-align:center">4</span><div class="fav-flag">🏴󠁧󠁢󠁥󠁮󠁧󠁿</div><div style="flex:1"><div class="fav-team-name">England</div><div style="font-size:10px;color:var(--text3)">4–2 opener · Kane 2 goals, Bellingham stars</div></div><div class="fav-odds">+650</div><div class="fav-bar-wrap"><div class="fav-bar" style="width:64%"></div></div></div>
-      <div class="fav-row"><span style="font-size:12px;font-weight:700;width:20px;color:var(--text3);text-align:center">5</span><div class="fav-flag">🇩🇪</div><div style="flex:1"><div class="fav-team-name">Germany</div><div style="font-size:10px;color:var(--text3)">4–0 opener · dangerous again</div></div><div class="fav-odds">+700</div><div class="fav-bar-wrap"><div class="fav-bar" style="width:58%"></div></div></div>
-      <div class="fav-row"><span style="font-size:12px;font-weight:700;width:20px;color:var(--text3);text-align:center">6</span><div class="fav-flag">🇧🇷</div><div style="flex:1"><div class="fav-team-name">Brazil</div><div style="font-size:10px;color:var(--text3)">1–1 vs Morocco · Vinícius Jr key</div></div><div class="fav-odds">+750</div><div class="fav-bar-wrap"><div class="fav-bar" style="width:52%"></div></div></div>
-      <div class="fav-row"><span style="font-size:12px;font-weight:700;width:20px;color:var(--text3);text-align:center">7</span><div class="fav-flag">🇵🇹</div><div style="flex:1"><div class="fav-team-name">Portugal</div><div style="font-size:10px;color:var(--text3)">1–1 vs Congo DR · Ronaldo pushing records</div></div><div class="fav-odds">+1100</div><div class="fav-bar-wrap"><div class="fav-bar" style="width:36%"></div></div></div>
-      <div class="fav-row"><span style="font-size:12px;font-weight:700;width:20px;color:var(--text3);text-align:center">8</span><div class="fav-flag">🇳🇱</div><div style="flex:1"><div class="fav-team-name">Netherlands</div><div style="font-size:10px;color:var(--text3)">2–2 vs Japan · van Dijk, Dumfries</div></div><div class="fav-odds">+1200</div><div class="fav-bar-wrap"><div class="fav-bar" style="width:30%"></div></div></div>
-      <div class="fav-row"><span style="font-size:12px;font-weight:700;width:20px;color:var(--text3);text-align:center">9</span><div class="fav-flag">🇺🇸</div><div style="flex:1"><div class="fav-team-name">USA (host)</div><div style="font-size:10px;color:var(--text3)">4–1 opener · home crowd advantage</div></div><div class="fav-odds">+1400</div><div class="fav-bar-wrap"><div class="fav-bar" style="width:24%"></div></div></div>
-      <div class="fav-row"><span style="font-size:12px;font-weight:700;width:20px;color:var(--text3);text-align:center">10</span><div class="fav-flag">🇳🇴</div><div style="flex:1"><div class="fav-team-name">Norway</div><div style="font-size:10px;color:var(--text3)">Dark horse · Haaland finally at WC</div></div><div class="fav-odds">+1600</div><div class="fav-bar-wrap"><div class="fav-bar" style="width:18%"></div></div></div>
+      <div class="ph"><div class="pht">🏆 To win · betting odds</div><span class="pbadge pb-blue">Jun 18</span></div>
+      <div class="frow"><span style="color:var(--gold);width:20px;text-align:center;font-weight:700">1</span><div class="fflag">🇫🇷</div><div style="flex:1"><div class="fname">France</div><div style="font-size:10px;color:var(--text3)">Co-favorite · Mbappé leads the line</div></div><div class="fodds">+450</div><div class="fbar"><div class="fbar-fill" style="width:85%"></div></div></div>
+      <div class="frow"><span style="color:var(--gold);width:20px;text-align:center;font-weight:700">2</span><div class="fflag">🇪🇸</div><div style="flex:1"><div class="fname">Spain</div><div style="font-size:10px;color:var(--text3)">Co-favorite · Yamal, Pedri</div></div><div class="fodds">+500</div><div class="fbar"><div class="fbar-fill" style="width:80%"></div></div></div>
+      <div class="frow"><span style="color:silver;width:20px;text-align:center;font-weight:700">3</span><div class="fflag">🇦🇷</div><div style="flex:1"><div class="fname">Argentina</div><div style="font-size:10px;color:var(--text3)">Defending champion · Messi</div></div><div class="fodds">+550</div><div class="fbar"><div class="fbar-fill" style="width:74%"></div></div></div>
+      <div class="frow"><span style="color:var(--text3);width:20px;text-align:center;font-weight:700">4</span><div class="fflag">🏴󠁧󠁢󠁥󠁮󠁧󠁿</div><div style="flex:1"><div class="fname">England</div><div style="font-size:10px;color:var(--text3)">4–2 opener · Kane, Bellingham</div></div><div class="fodds">+650</div><div class="fbar"><div class="fbar-fill" style="width:64%"></div></div></div>
+      <div class="frow"><span style="color:var(--text3);width:20px;text-align:center;font-weight:700">5</span><div class="fflag">🇩🇪</div><div style="flex:1"><div class="fname">Germany</div><div style="font-size:10px;color:var(--text3)">7–1 opener · dangerous again</div></div><div class="fodds">+700</div><div class="fbar"><div class="fbar-fill" style="width:58%"></div></div></div>
+      <div class="frow"><span style="color:var(--text3);width:20px;text-align:center;font-weight:700">6</span><div class="fflag">🇧🇷</div><div style="flex:1"><div class="fname">Brazil</div><div style="font-size:10px;color:var(--text3)">Drawn vs Morocco · Vini Jr key</div></div><div class="fodds">+750</div><div class="fbar"><div class="fbar-fill" style="width:52%"></div></div></div>
+      <div class="frow"><span style="color:var(--text3);width:20px;text-align:center;font-weight:700">7</span><div class="fflag">🇵🇹</div><div style="flex:1"><div class="fname">Portugal</div><div style="font-size:10px;color:var(--text3)">1–1 opener · Ronaldo</div></div><div class="fodds">+1100</div><div class="fbar"><div class="fbar-fill" style="width:36%"></div></div></div>
+      <div class="frow"><span style="color:var(--text3);width:20px;text-align:center;font-weight:700">8</span><div class="fflag">🇺🇸</div><div style="flex:1"><div class="fname">USA (host)</div><div style="font-size:10px;color:var(--text3)">4–1 opener · home crowd</div></div><div class="fodds">+1400</div><div class="fbar"><div class="fbar-fill" style="width:24%"></div></div></div>
+      <div class="frow"><span style="color:var(--text3);width:20px;text-align:center;font-weight:700">9</span><div class="fflag">🇳🇴</div><div style="flex:1"><div class="fname">Norway</div><div style="font-size:10px;color:var(--text3)">Dark horse · Haaland</div></div><div class="fodds">+1600</div><div class="fbar"><div class="fbar-fill" style="width:18%"></div></div></div>
     </div>
     <div class="col">
       <div class="panel">
-        <div class="ph"><div class="ph-title">⚡ Biggest surprises so far</div></div>
-        <div style="padding:9px 14px;border-bottom:0.5px solid var(--border);font-size:12px;color:var(--text2)"><span style="color:var(--text);font-weight:500">🇨🇻 Cape Verde 0–0 Spain</span> — Goalkeeper Vozinha went viral, gained 2M followers overnight</div>
-        <div style="padding:9px 14px;border-bottom:0.5px solid var(--border);font-size:12px;color:var(--text2)"><span style="color:var(--text);font-weight:500">🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland 1–0 Haiti</span> — Scotland end 28-year World Cup drought in style</div>
-        <div style="padding:9px 14px;font-size:12px;color:var(--text2)"><span style="color:var(--text);font-weight:500">🇸🇪 Sweden 5–1 Tunisia</span> — Gyökeres hat trick; Sweden look like a genuine dark horse</div>
+        <div class="ph"><div class="pht">⚡ Biggest surprises</div></div>
+        <div style="padding:8px 13px;border-bottom:0.5px solid var(--border);font-size:12px;color:var(--text2)"><strong style="color:var(--text)">🇨🇻 Cape Verde 0–0 Spain</strong> — Vozinha went viral, gained 2M followers</div>
+        <div style="padding:8px 13px;border-bottom:0.5px solid var(--border);font-size:12px;color:var(--text2)"><strong style="color:var(--text)">🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland 1–0 Haiti</strong> — End 28-year WC drought</div>
+        <div style="padding:8px 13px;font-size:12px;color:var(--text2)"><strong style="color:var(--text)">🇸🇪 Sweden 5–1 Tunisia</strong> — Gyokeres hat trick, dark horse alert</div>
       </div>
       <div class="panel">
-        <div class="ph"><div class="ph-title">📊 Today's match odds</div></div>
-        <div id="today-odds"><div class="loading-msg"><div class="spinner-wrap"><div class="spinner"></div>Loading odds…</div></div></div>
+        <div class="ph"><div class="pht">📊 Today match odds</div></div>
+        <div id="odds-body"><div class="empty">No upcoming matches today</div></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- VENUES TAB -->
 <div class="tab-section" id="tab-venues">
   <div class="grid3">
     <div class="panel">
-      <div class="ph"><div class="ph-title">🇺🇸 United States venues</div></div>
-      <div class="venue-row"><div style="font-size:18px">🏟</div><div><div class="venue-name">MetLife Stadium</div><div class="venue-city">East Rutherford, New Jersey</div><div class="venue-cap">Capacity: 82,500 · Final venue — July 19</div></div></div>
-      <div class="venue-row"><div style="font-size:18px">🏟</div><div><div class="venue-name">SoFi Stadium</div><div class="venue-city">Inglewood, California</div><div class="venue-cap">Capacity: 70,240 · Opening match + Group B</div></div></div>
-      <div class="venue-row"><div style="font-size:18px">🏟</div><div><div class="venue-name">AT&T Stadium</div><div class="venue-city">Arlington (Dallas), Texas</div><div class="venue-cap">Capacity: 80,000 · England 4–2 Croatia played here</div></div></div>
-      <div class="venue-row"><div style="font-size:18px">🏟</div><div><div class="venue-name">Mercedes-Benz Stadium</div><div class="venue-city">Atlanta, Georgia</div><div class="venue-cap">Capacity: 71,000 · Group A matches</div></div></div>
-      <div class="venue-row"><div style="font-size:18px">🏟</div><div><div class="venue-name">Levi's Stadium</div><div class="venue-city">Santa Clara (San Jose), California</div><div class="venue-cap">Capacity: 68,500 · Group stage + knockout rounds</div></div></div>
-      <div class="venue-row"><div style="font-size:18px">🏟</div><div><div class="venue-name">Hard Rock Stadium</div><div class="venue-city">Miami Gardens, Florida</div><div class="venue-cap">Capacity: 65,326 · 3rd place playoff July 18</div></div></div>
-      <div class="venue-row"><div style="font-size:18px">🏟</div><div><div class="venue-name">Arrowhead Stadium</div><div class="venue-city">Kansas City, Missouri</div><div class="venue-cap">Capacity: 76,416 · Argentina 3–0 Algeria played here</div></div></div>
-      <div class="venue-row"><div style="font-size:18px">🏟</div><div><div class="venue-name">Lincoln Financial Field</div><div class="venue-city">Philadelphia, Pennsylvania</div><div class="venue-cap">Capacity: 69,796 · Group stage matches</div></div></div>
-      <div class="venue-row"><div style="font-size:18px">🏟</div><div><div class="venue-name">Lumen Field</div><div class="venue-city">Seattle, Washington</div><div class="venue-cap">Capacity: 72,000 · USA vs Australia upcoming</div></div></div>
+      <div class="ph"><div class="pht">🇺🇸 United States</div></div>
+      <div class="vrow"><div><div class="vname">MetLife Stadium</div><div class="vcity">East Rutherford, New Jersey</div><div class="vcap">Cap: 82,500 · Final Jul 19</div></div></div>
+      <div class="vrow"><div><div class="vname">SoFi Stadium</div><div class="vcity">Inglewood, California</div><div class="vcap">Cap: 70,240 · Opening match + Group B</div></div></div>
+      <div class="vrow"><div><div class="vname">AT&T Stadium</div><div class="vcity">Arlington, Texas</div><div class="vcap">Cap: 80,000 · England 4–2 Croatia</div></div></div>
+      <div class="vrow"><div><div class="vname">Mercedes-Benz Stadium</div><div class="vcity">Atlanta, Georgia</div><div class="vcap">Cap: 71,000 · Group A</div></div></div>
+      <div class="vrow"><div><div class="vname">Levi's Stadium</div><div class="vcity">Santa Clara, California</div><div class="vcap">Cap: 68,500 · Group C</div></div></div>
+      <div class="vrow"><div><div class="vname">Hard Rock Stadium</div><div class="vcity">Miami, Florida</div><div class="vcap">Cap: 65,326 · 3rd place Jul 18</div></div></div>
+      <div class="vrow"><div><div class="vname">Arrowhead Stadium</div><div class="vcity">Kansas City, Missouri</div><div class="vcap">Cap: 76,416 · Group E/J</div></div></div>
+      <div class="vrow"><div><div class="vname">Lincoln Financial Field</div><div class="vcity">Philadelphia, Pennsylvania</div><div class="vcap">Cap: 69,796 · Group F</div></div></div>
+      <div class="vrow"><div><div class="vname">Lumen Field</div><div class="vcity">Seattle, Washington</div><div class="vcap">Cap: 72,000 · Group D</div></div></div>
     </div>
     <div class="panel">
-      <div class="ph"><div class="ph-title">🇨🇦 Canada venues</div></div>
-      <div class="venue-row"><div style="font-size:18px">🏟</div><div><div class="venue-name">BC Place</div><div class="venue-city">Vancouver, British Columbia</div><div class="venue-cap">Capacity: 54,500 · Group B matches</div></div></div>
-      <div class="venue-row"><div style="font-size:18px">🏟</div><div><div class="venue-name">BMO Field</div><div class="venue-city">Toronto, Ontario</div><div class="venue-cap">Capacity: 45,000 · Group L matches</div></div></div>
+      <div class="ph"><div class="pht">🇨🇦 Canada</div></div>
+      <div class="vrow"><div><div class="vname">BC Place</div><div class="vcity">Vancouver</div><div class="vcap">Cap: 54,500 · Group B</div></div></div>
+      <div class="vrow"><div><div class="vname">BMO Field</div><div class="vcity">Toronto</div><div class="vcap">Cap: 45,000 · Group L</div></div></div>
     </div>
     <div class="panel">
-      <div class="ph"><div class="ph-title">🇲🇽 Mexico venues</div></div>
-      <div class="venue-row"><div style="font-size:18px">🏟</div><div><div class="venue-name">Estadio Azteca</div><div class="venue-city">Mexico City</div><div class="venue-cap">Capacity: 87,523 · Opening match + Group A/K</div></div></div>
-      <div class="venue-row"><div style="font-size:18px">🏟</div><div><div class="venue-name">Estadio Akron</div><div class="venue-city">Guadalajara</div><div class="venue-cap">Capacity: 49,850 · Group A matches</div></div></div>
-      <div class="venue-row"><div style="font-size:18px">🏟</div><div><div class="venue-name">Estadio BBVA</div><div class="venue-city">Monterrey</div><div class="venue-cap">Capacity: 51,000 · Group stage matches</div></div></div>
-      <div class="venue-row"><div style="font-size:18px">🏟</div><div><div class="venue-name">Estadio Ciudad de México</div><div class="venue-city">Mexico City</div><div class="venue-cap">Capacity: 35,161 · Group stage matches</div></div></div>
+      <div class="ph"><div class="pht">🇲🇽 Mexico</div></div>
+      <div class="vrow"><div><div class="vname">Estadio Azteca</div><div class="vcity">Mexico City</div><div class="vcap">Cap: 87,523 · Group A/K</div></div></div>
+      <div class="vrow"><div><div class="vname">Estadio Akron</div><div class="vcity">Guadalajara</div><div class="vcap">Cap: 49,850 · Group A</div></div></div>
+      <div class="vrow"><div><div class="vname">Estadio BBVA</div><div class="vcity">Monterrey</div><div class="vcap">Cap: 51,000 · Group G/H</div></div></div>
+      <div class="vrow"><div><div class="vname">Estadio Ciudad de Mexico</div><div class="vcity">Mexico City</div><div class="vcap">Cap: 35,161 · Group K</div></div></div>
     </div>
   </div>
 </div>
 
-<!-- NEWS TAB -->
 <div class="tab-section" id="tab-news">
   <div class="grid2">
     <div class="panel">
-      <div class="ph">
-        <div class="ph-title">🔥 Top stories</div>
-        <span class="ph-badge badge-blue" id="news-tab-badge">Live</span>
-      </div>
-      <div id="news-tab-body"><div class="loading-msg"><div class="spinner-wrap"><div class="spinner"></div>Loading news…</div></div></div>
+      <div class="ph"><div class="pht">🔥 Latest stories</div><span class="pbadge pb-blue" id="news-tab-badge">—</span></div>
+      <div id="news-tab-body"><div class="spin-wrap"><div class="spinner"></div>Loading…</div></div>
     </div>
     <div class="panel">
-      <div class="ph"><div class="ph-title">🔗 Live coverage</div></div>
-      <div style="padding:14px">
-        <div style="display:flex;flex-direction:column;gap:10px;font-size:12px">
-          <a href="https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/scores-fixtures" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none;display:flex;align-items:center;gap:8px"><span style="font-size:16px">⚽</span>FIFA.com — official scores & fixtures ↗</a>
-          <a href="https://www.espn.com/soccer/bracket" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none;display:flex;align-items:center;gap:8px"><span style="font-size:16px">📊</span>ESPN — live bracket ↗</a>
-          <a href="https://www.foxsports.com/soccer/fifa-world-cup/scores" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none;display:flex;align-items:center;gap:8px"><span style="font-size:16px">📺</span>Fox Sports — live scores ↗</a>
-          <a href="https://www.sofascore.com/football/tournament/world/world-championship/16" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none;display:flex;align-items:center;gap:8px"><span style="font-size:16px">📡</span>Sofascore — live stats ↗</a>
-          <a href="https://www.nbcsports.com/soccer/news/2026-world-cup-group-stage-table-full-standings-for-all-12-groups" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none;display:flex;align-items:center;gap:8px"><span style="font-size:16px">📰</span>NBC Sports — standings ↗</a>
-        </div>
+      <div class="ph"><div class="pht">🔗 Live coverage</div></div>
+      <div style="padding:14px;display:flex;flex-direction:column;gap:10px;font-size:12px">
+        <a href="https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/scores-fixtures" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none">⚽ FIFA.com — official scores ↗</a>
+        <a href="https://www.espn.com/soccer/bracket" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none">📊 ESPN — live bracket ↗</a>
+        <a href="https://www.foxsports.com/soccer/fifa-world-cup/scores" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none">📺 Fox Sports — live scores ↗</a>
+        <a href="https://www.sofascore.com/football/tournament/world/world-championship/16" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none">📡 Sofascore — live stats ↗</a>
       </div>
     </div>
   </div>
 </div>
 
-<!-- GOLDEN BOOT TAB -->
-<div class="tab-section" id="tab-golden-boot">
+<div class="tab-section" id="tab-boot">
   <div class="grid2">
     <div class="panel">
-      <div class="ph"><div class="ph-title">⚽ Golden Boot race · top scorers</div><span class="ph-badge badge-blue" id="scorers-badge">Loading…</span></div>
-      <div id="scorers-list"><div class="loading-msg"><div class="spinner-wrap"><div class="spinner"></div>Loading scorers…</div></div></div>
+      <div class="ph"><div class="pht">⚽ Golden Boot</div><span class="pbadge pb-blue" id="boot-badge">—</span></div>
+      <div id="boot-body"><div class="spin-wrap"><div class="spinner"></div>Loading…</div></div>
     </div>
     <div class="panel">
-      <div class="ph"><div class="ph-title">🥅 Tournament stats</div></div>
-      <div style="padding:12px 14px;border-bottom:0.5px solid var(--border)">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div style="background:var(--bg3);border-radius:8px;padding:12px;text-align:center"><div style="font-size:28px;font-weight:700;color:var(--blue)" id="stat-goals">—</div><div style="font-size:10px;color:var(--text3);margin-top:2px">Total goals</div></div>
-          <div style="background:var(--bg3);border-radius:8px;padding:12px;text-align:center"><div style="font-size:28px;font-weight:700;color:var(--green)" id="stat-avg">—</div><div style="font-size:10px;color:var(--text3);margin-top:2px">Goals per game</div></div>
-          <div style="background:var(--bg3);border-radius:8px;padding:12px;text-align:center"><div style="font-size:28px;font-weight:700;color:var(--yellow)" id="stat-played">—</div><div style="font-size:10px;color:var(--text3);margin-top:2px">Matches played</div></div>
-          <div style="background:var(--bg3);border-radius:8px;padding:12px;text-align:center"><div style="font-size:28px;font-weight:700;color:var(--red)">3</div><div style="font-size:10px;color:var(--text3);margin-top:2px">Hat tricks</div></div>
-        </div>
-      </div>
-      <div style="padding:10px 14px;border-bottom:0.5px solid var(--border)">
-        <div style="font-size:11px;font-weight:500;color:var(--text);margin-bottom:6px">🏆 Biggest wins so far</div>
-        <div style="font-size:11px;color:var(--text2);line-height:1.9">🇸🇪 Sweden 5–1 Tunisia<br>🇩🇪 Germany 4–0 Saudi Arabia<br>🇺🇸 USA 4–1 Paraguay<br>🏴󠁧󠁢󠁥󠁮󠁧󠁿 England 4–2 Croatia<br>🇳🇴 Norway 4–1 Iraq</div>
-      </div>
-      <div style="padding:10px 14px">
-        <div style="font-size:11px;font-weight:500;color:var(--text);margin-bottom:6px">📌 Records broken</div>
-        <div style="font-size:11px;color:var(--text2);line-height:1.9">🇦🇷 Messi ties Klose — 16 WC goals all-time<br>🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland end 28-year WC absence<br>🇳🇴 Haaland scores 1st ever WC goal<br>🇯🇴 Jordan score 1st ever WC goal</div>
+      <div class="ph"><div class="pht">🥅 Tournament stats</div></div>
+      <div style="padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="background:var(--bg3);border-radius:8px;padding:12px;text-align:center"><div style="font-size:26px;font-weight:700;color:var(--blue)" id="stat-goals">—</div><div style="font-size:10px;color:var(--text3);margin-top:2px">Total goals</div></div>
+        <div style="background:var(--bg3);border-radius:8px;padding:12px;text-align:center"><div style="font-size:26px;font-weight:700;color:var(--green)" id="stat-avg">—</div><div style="font-size:10px;color:var(--text3);margin-top:2px">Goals per game</div></div>
+        <div style="background:var(--bg3);border-radius:8px;padding:12px;text-align:center"><div style="font-size:26px;font-weight:700;color:var(--yellow)" id="stat-played">—</div><div style="font-size:10px;color:var(--text3);margin-top:2px">Matches played</div></div>
+        <div style="background:var(--bg3);border-radius:8px;padding:12px;text-align:center"><div style="font-size:26px;font-weight:700;color:var(--red)">3</div><div style="font-size:10px;color:var(--text3);margin-top:2px">Hat tricks</div></div>
       </div>
     </div>
   </div>
@@ -431,18 +337,23 @@ const CONFIG = {
 </main>
 
 <footer class="footer">
-  <span>Live data: <a href="https://www.football-data.org" target="_blank" rel="noopener">football-data.org</a> · Auto-refreshes every 60s</span>
+  <span>Data: <a href="https://football-data.org" target="_blank">football-data.org</a> · Updates every 5 min</span>
   <div class="footer-links">
-    <a href="https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/standings" target="_blank" rel="noopener">FIFA standings</a>
-    <a href="https://www.espn.com/soccer/bracket" target="_blank" rel="noopener">Bracket</a>
-    <a href="https://www.foxsports.com/soccer/fifa-world-cup/scores" target="_blank" rel="noopener">Live scores</a>
+    <a href="https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/standings" target="_blank">FIFA standings</a>
+    <a href="https://www.espn.com/soccer/bracket" target="_blank">Bracket</a>
+    <a href="https://www.foxsports.com/soccer/fifa-world-cup/scores" target="_blank">Live scores</a>
   </div>
 </footer>
 
 <script>
-// ── Utilities ──────────────────────────────────────────────────
-document.getElementById('js-date').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
-
+// ── Helpers ───────────────────────────────────────────────────
+function ago(ts) {
+  const d = Math.floor((Date.now() - new Date(ts)) / 60000);
+  if (d < 1) return 'Just now';
+  if (d < 60) return d + 'm ago';
+  if (d < 1440) return Math.floor(d/60) + 'h ago';
+  return Math.floor(d/1440) + 'd ago';
+}
 function fmtTime(utc) {
   return new Date(utc).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});
 }
@@ -450,594 +361,324 @@ function fmtDate(utc) {
   return new Date(utc).toLocaleDateString('en-US',{month:'short',day:'numeric'});
 }
 function isToday(utc) {
-  // Compare in local timezone
-  const d = new Date(utc);
-  const t = new Date();
-  return d.getFullYear()===t.getFullYear() &&
-         d.getMonth()===t.getMonth() &&
-         d.getDate()===t.getDate();
-}
-function isTodayOrRecent(utc) {
-  // Include matches from last 24h in case of timezone edge cases
-  const d = new Date(utc);
-  const now = new Date();
-  const diffHours = (now - d) / 3600000;
-  return isToday(utc) || (diffHours > 0 && diffHours < 24);
-}
-function statusLabel(s) {
-  if (s === 'IN_PLAY' || s === 'PAUSED') return 'live';
-  if (s === 'FINISHED') return 'ft';
-  return 'upcoming';
+  const d = new Date(utc), t = new Date();
+  return d.getFullYear()===t.getFullYear()&&d.getMonth()===t.getMonth()&&d.getDate()===t.getDate();
 }
 function scoreStr(m) {
   if (!m.score) return '—';
-  const st   = m.status;
-  const sc   = m.score;
-
-  // Try every possible field name the API uses
-  const ft = sc.fullTime || sc.regularTime || sc.extraTime;
-  const ht = sc.halfTime;
-
-  // Helper: is a score object valid?
-  const valid = obj => obj && obj.home !== null && obj.home !== undefined
-                           && obj.away !== null && obj.away !== undefined;
-
-  // FINISHED — try fullTime first, then winner field as fallback
-  if (st === 'FINISHED') {
-    if (valid(ft)) return ft.home + ' – ' + ft.away;
-    // Last resort: if API has winner but no score yet, show pending
-    return 'Final pending';
+  const ft = m.score.fullTime || m.score.regularTime;
+  if (ft && ft.home !== null && ft.home !== undefined) return ft.home + ' – ' + ft.away;
+  if (m.status === 'PAUSED') {
+    const ht = m.score.halfTime;
+    if (ht && ht.home !== null) return ht.home + ' – ' + ht.away + ' HT';
   }
-
-  // PAUSED (halftime break)
-  if (st === 'PAUSED') {
-    if (valid(ht)) return ht.home + ' – ' + ht.away + ' HT';
-    return '0 – 0 HT';
-  }
-
-  // IN_PLAY — free tier doesn't give live scores
-  if (st === 'IN_PLAY') return 'Live';
-
+  if (m.status === 'IN_PLAY') return 'Live';
+  if (m.status === 'FINISHED') return 'Final pending';
   return '—';
 }
-
-
-// ── API fetch with rate-limit handling ─────────────────────────
-// ── Load data — use embedded snapshot first (instant), then fetch fresh ──
-async function loadData(bustCache) {
-  if (!bustCache && window.WC_SNAPSHOT) return window.WC_SNAPSHOT;
-  const res = await fetch('./data.json?t=' + Date.now());
-  if (!res.ok) throw new Error('Could not load data.json');
-  return res.json();
+function stateOf(m) {
+  if (m.status === 'IN_PLAY' || m.status === 'PAUSED') return 'live';
+  if (m.status === 'FINISHED') return 'ft';
+  return 'upcoming';
 }
 
-// ── Render ticker ──────────────────────────────────────────────
-function renderTicker(matches) {
-  const finished = matches.filter(m => m.status === 'FINISHED' || m.status === 'IN_PLAY' || m.status === 'PAUSED');
-  if(!finished.length) return;
-
-  const items = finished.map(m => {
-    const sc = scoreStr(m);
-    const status = m.status === 'FINISHED' ? 'FT' : m.status === 'PAUSED' ? 'HT' : 'LIVE';
-    return `<span class="ticker-item">
-      <span class="ti-teams">${m.homeTeam.shortName||m.homeTeam.name}</span>
-      <span class="ti-score">${sc}</span>
-      <span class="ti-teams">${m.awayTeam.shortName||m.awayTeam.name}</span>
-      <span class="ti-ft">${status} · ${m.group||'WC'}</span>
-    </span>`;
-  }).join('');
-
-  const track = document.getElementById('ticker-track');
-  track.innerHTML = '<span class="ticker-label">SCORES</span>' + items +
-                    '<span class="ticker-label">SCORES</span>' + items;
-  const dur = Math.max(20, finished.length * 3);
-  track.style.animation = 'none';
-  track.offsetHeight;
-  track.style.animation = 'wctick ' + dur + 's linear infinite';
+// ── Venue map ─────────────────────────────────────────────────
+const VENUES = {
+  'Mexico': 'Estadio Akron, Guadalajara',
+  'South Korea': 'Estadio Akron, Guadalajara',
+  'South Africa': 'Mercedes-Benz Stadium, Atlanta',
+  'Czechia': 'Mercedes-Benz Stadium, Atlanta',
+  'Switzerland': 'SoFi Stadium, Los Angeles',
+  'Canada': 'BC Place, Vancouver',
+  'Qatar': 'BC Place, Vancouver',
+  'Bosnia-Herzegovina': 'SoFi Stadium, Los Angeles',
+  'Scotland': 'AT&T Stadium, Dallas',
+  'Haiti': 'AT&T Stadium, Dallas',
+  'Brazil': "Levi's Stadium, San Jose",
+  'Morocco': "Levi's Stadium, San Jose",
+  'United States': 'SoFi Stadium, Los Angeles',
+  'Paraguay': 'SoFi Stadium, Los Angeles',
+  'Australia': 'Lumen Field, Seattle',
+  'Turkey': 'Lumen Field, Seattle',
+  'Germany': 'MetLife Stadium, New York',
+  'Japan': 'Hard Rock Stadium, Miami',
+  'Norway': 'Arrowhead Stadium, Kansas City',
+  'Austria': 'Arrowhead Stadium, Kansas City',
+  'Sweden': 'Hard Rock Stadium, Miami',
+  'Netherlands': 'Hard Rock Stadium, Miami',
+  'Uruguay': 'Lincoln Financial Field, Philadelphia',
+  'Saudi Arabia': 'Lincoln Financial Field, Philadelphia',
+  'Ivory Coast': 'Mercedes-Benz Stadium, Atlanta',
+  'Belgium': 'Mercedes-Benz Stadium, Atlanta',
+  'Egypt': 'Mercedes-Benz Stadium, Atlanta',
+  'Ecuador': 'Mercedes-Benz Stadium, Atlanta',
+  'Iran': 'Estadio BBVA, Monterrey',
+  'New Zealand': 'Estadio BBVA, Monterrey',
+  'Spain': 'Estadio Azteca, Mexico City',
+  'France': 'Estadio Azteca, Mexico City',
+  'Senegal': 'Estadio Azteca, Mexico City',
+  'Cape Verde Islands': 'Estadio Azteca, Mexico City',
+  'Argentina': 'Arrowhead Stadium, Kansas City',
+  'Algeria': 'Arrowhead Stadium, Kansas City',
+  'Iraq': 'AT&T Stadium, Dallas',
+  'Colombia': 'Estadio Azteca, Mexico City',
+  'Portugal': 'Estadio Ciudad de Mexico',
+  'Congo DR': 'Estadio Ciudad de Mexico',
+  'Uzbekistan': 'Estadio Azteca, Mexico City',
+  'England': 'AT&T Stadium, Dallas',
+  'Croatia': 'AT&T Stadium, Dallas',
+  'Ghana': 'BMO Field, Toronto',
+  'Panama': 'BMO Field, Toronto',
+  'Ivory Coast': 'Mercedes-Benz Stadium, Atlanta',
+  'Jordan': 'Arrowhead Stadium, Kansas City',
+  'Tunisia': 'Hard Rock Stadium, Miami',
+};
+function getVenue(m) {
+  return m.venue || VENUES[m.homeTeam?.name] || VENUES[m.awayTeam?.name] || '';
 }
 
-// ── Render today's fixtures ────────────────────────────────────
-function matchCard(m, standings) {
-  const st = statusLabel(m.status);
+// ── Render functions ──────────────────────────────────────────
+let cachedStandings = [];
+
+function matchRow(m, standings) {
+  const st = stateOf(m);
   const sc = scoreStr(m);
+  const timeLabel = st==='live' ? '● LIVE' : st==='ft' ? 'FT' : fmtTime(m.utcDate);
+  const venue = getVenue(m);
 
-  // Time label
-  let timeLabel, timeClass;
-  if (st === 'live') { timeLabel = '● LIVE'; timeClass = 'live'; }
-  else if (st === 'ft') { timeLabel = 'FT'; timeClass = 'ft'; }
-  else { timeLabel = fmtTime(m.utcDate); timeClass = ''; }
-
-  // Score / center display
   let scoreHtml;
   if (st === 'upcoming') {
-    // Show points for each team going into the match
-    const hPts = getTeamPoints(m.homeTeam.name, standings);
-    const aPts = getTeamPoints(m.awayTeam.name, standings);
-    const hStr = hPts !== null ? hPts + ' pts' : '—';
-    const aStr = aPts !== null ? aPts + ' pts' : '—';
-    scoreHtml = `<div class="match-score-wrap">
-      <div class="match-score upcoming">vs</div>
-      <div class="match-pts"><span class="pts-val">${hStr}</span> · <span class="pts-val">${aStr}</span></div>
-      <div class="score-label">current pts</div>
-    </div>`;
-  } else if (st === 'live') {
-    const liveNote = sc === 'Live' ? 'in progress' : 'halftime';
-    scoreHtml = `<div class="match-score-wrap">
-      <div class="match-score live">${sc}</div>
-      <div class="score-label">${liveNote}</div>
+    const hp = getPts(m.homeTeam?.name, standings);
+    const ap = getPts(m.awayTeam?.name, standings);
+    scoreHtml = `<div class="mscwrap">
+      <div class="msc up">vs</div>
+      <div class="pts-row"><span>${hp !== null ? hp+'pts' : '—'}</span> · <span>${ap !== null ? ap+'pts' : '—'}</span></div>
+      <div class="msc-lbl">current pts</div>
     </div>`;
   } else {
-    scoreHtml = `<div class="match-score-wrap">
-      <div class="match-score ft">${sc}</div>
-      <div class="score-label">final score</div>
+    scoreHtml = `<div class="mscwrap">
+      <div class="msc ${st}">${sc}</div>
+      <div class="msc-lbl">${st==='live'?'in progress':st==='ft'?'final score':''}</div>
     </div>`;
   }
 
-  return `<a class="match-row state-${st}" href="https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/scores-fixtures" target="_blank" rel="noopener">
-    <div class="match-time ${timeClass}">${timeLabel}</div>
-    <div class="match-teams">
-      <div class="match-team">${m.homeTeam.name} vs ${m.awayTeam.name}</div>
-      <div class="match-venue">${[getVenue(m) ? '🏟 ' + getVenue(m) : null, m.group].filter(Boolean).join(' · ')}</div>
+  const grpLabel = [venue ? '🏟 '+venue : null, m.group].filter(Boolean).join(' · ');
+  return `<a class="mrow ${st}" href="https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/scores-fixtures" target="_blank" rel="noopener">
+    <div class="mtime ${st==='live'?'live':st==='ft'?'ft':'up'}">${timeLabel}</div>
+    <div class="mteams">
+      <div class="mteam">${m.homeTeam.name} vs ${m.awayTeam.name}</div>
+      <div class="mvenue">${grpLabel}</div>
     </div>
     ${scoreHtml}
   </a>`;
 }
 
-
-// ── Venue lookup (football-data.org free tier omits venue field) ──
-const VENUE_MAP = {
-  // Group A
-  'Mexico':       { home: 'Estadio Akron, Guadalajara' },
-  // Group B
-  'Switzerland':  { home: 'SoFi Stadium, Los Angeles' },
-  'Canada':       { home: 'BC Place, Vancouver' },
-  'Qatar':        { home: 'BC Place, Vancouver' },
-  'Bosnia-Herzegovina': { home: 'SoFi Stadium, Los Angeles' },
-  // Group C
-  'Scotland':     { home: 'AT&T Stadium, Dallas' },
-  'Brazil':       { home: 'Levi's Stadium, San Jose' },
-  'Morocco':      { home: 'Levi's Stadium, San Jose' },
-  'Haiti':        { home: 'AT&T Stadium, Dallas' },
-  // Group D
-  'United States':{ home: 'SoFi Stadium, Los Angeles' },
-  'Australia':    { home: 'Lumen Field, Seattle' },
-  'Turkey':       { home: 'Lumen Field, Seattle' },
-  'Paraguay':     { home: 'SoFi Stadium, Los Angeles' },
-  // Group E
-  'Germany':      { home: 'MetLife Stadium, New York' },
-  'Japan':        { home: 'MetLife Stadium, New York' },
-  'Norway':       { home: 'Arrowhead Stadium, Kansas City' },
-  'Austria':      { home: 'Arrowhead Stadium, Kansas City' },
-  // Group F
-  'Sweden':       { home: 'Hard Rock Stadium, Miami' },
-  'Netherlands':  { home: 'Hard Rock Stadium, Miami' },
-  'Uruguay':      { home: 'Lincoln Financial Field, Philadelphia' },
-  'Saudi Arabia': { home: 'Lincoln Financial Field, Philadelphia' },
-  // Group G
-  'Ivory Coast':  { home: 'Mercedes-Benz Stadium, Atlanta' },
-  'Belgium':      { home: 'Mercedes-Benz Stadium, Atlanta' },
-  'Egypt':        { home: 'Mercedes-Benz Stadium, Atlanta' },
-  'Ecuador':      { home: 'Mercedes-Benz Stadium, Atlanta' },
-  // Group H
-  'Iran':         { home: 'Estadio BBVA, Monterrey' },
-  'New Zealand':  { home: 'Estadio BBVA, Monterrey' },
-  // Group I
-  'Spain':        { home: 'Estadio Azteca, Mexico City' },
-  'France':       { home: 'Estadio Azteca, Mexico City' },
-  'Senegal':      { home: 'Estadio Azteca, Mexico City' },
-  'Cape Verde Islands': { home: 'Estadio Azteca, Mexico City' },
-  // Group J
-  'Argentina':    { home: 'Arrowhead Stadium, Kansas City' },
-  'Algeria':      { home: 'Arrowhead Stadium, Kansas City' },
-  'Iraq':         { home: 'AT&T Stadium, Dallas' },
-  // Group K
-  'Colombia':     { home: 'Estadio Azteca, Mexico City' },
-  'Portugal':     { home: 'Estadio Ciudad de Mexico' },
-  'Congo DR':     { home: 'Estadio Ciudad de Mexico' },
-  'Uzbekistan':   { home: 'Estadio Azteca, Mexico City' },
-  // Group L
-  'England':      { home: 'AT&T Stadium, Dallas' },
-  'Ghana':        { home: 'BMO Field, Toronto' },
-  'Croatia':      { home: 'AT&T Stadium, Dallas' },
-  'Panama':       { home: 'BMO Field, Toronto' },
-};
-
-function getVenue(m) {
-  if (m.venue) return m.venue;
-  // Look up by home team name
-  const home = m.homeTeam?.name || '';
-  for (const [key, val] of Object.entries(VENUE_MAP)) {
-    if (home.includes(key)) return val.home;
-  }
-  return null;
-}
-
-function getTeamPoints(teamName, standings) {
-  if (!standings || !standings.length) return null;
-  for (const grp of standings) {
-    for (const row of grp.table || []) {
-      if (row.team.name === teamName || row.team.shortName === teamName) {
-        return row.points;
-      }
+function getPts(name, standings) {
+  if (!name || !standings) return null;
+  for (const g of standings) {
+    for (const r of g.table||[]) {
+      if (r.team?.name === name || r.team?.shortName === name) return r.points;
     }
   }
   return null;
 }
 
+function renderTicker(matches) {
+  const done = matches.filter(m => m.status==='FINISHED'||m.status==='IN_PLAY'||m.status==='PAUSED');
+  if (!done.length) return;
+  const items = done.map(m => {
+    const sc = scoreStr(m);
+    const lbl = m.status==='FINISHED'?'FT':m.status==='PAUSED'?'HT':'LIVE';
+    return `<span class="ti"><span class="ti-t">${m.homeTeam.shortName||m.homeTeam.name}</span><span class="ti-sc">${sc}</span><span class="ti-t">${m.awayTeam.shortName||m.awayTeam.name}</span><span class="ti-ft">${lbl}</span></span>`;
+  }).join('');
+  const track = document.getElementById('ticker');
+  track.innerHTML = '<span class="ticker-lbl">SCORES</span>' + items + '<span class="ticker-lbl">SCORES</span>' + items;
+  const dur = Math.max(20, done.length * 3);
+  track.style.animation = 'none';
+  track.offsetHeight;
+  track.style.animation = `tick ${dur}s linear infinite`;
+}
+
 function renderToday(matches, standings) {
-  const todayM = matches.filter(m => isTodayOrRecent(m.utcDate));
-  const badge = document.getElementById('today-badge');
-  badge.textContent = todayM.length ? '● ' + todayM.length + ' matches' : 'No matches today';
-
-  if (!todayM.length) {
-    document.getElementById('today-matches').innerHTML =
-      '<div class="loading-msg">No matches scheduled today</div>';
-    return;
-  }
-
-  document.getElementById('today-matches').innerHTML =
-    todayM.map(m => matchCard(m, standings)).join('');
+  const today = matches.filter(m => isToday(m.utcDate));
+  document.getElementById('today-badge').textContent = today.length ? '● '+today.length+' matches' : 'No matches today';
+  document.getElementById('today-body').innerHTML = today.length
+    ? today.map(m => matchRow(m, standings)).join('')
+    : '<div class="empty">No matches scheduled today</div>';
 }
 
-
-
-// ── Render upcoming ──────────────────────────────────────────
 function renderUpcoming(matches, standings) {
-  const upcoming = matches
-    .filter(m => m.status === 'TIMED' || m.status === 'SCHEDULED')
-    .filter(m => !isToday(m.utcDate))
-    .slice(0, 8);
-
-  if (!upcoming.length) {
-    document.getElementById('upcoming-matches').innerHTML =
-      '<div class="loading-msg">No upcoming fixtures found</div>';
-    return;
-  }
-
-  let lastDate = '';
-  const html = upcoming.map(m => {
+  const up = matches.filter(m => (m.status==='TIMED'||m.status==='SCHEDULED') && !isToday(m.utcDate)).slice(0,8);
+  if (!up.length) { document.getElementById('upcoming-body').innerHTML = '<div class="empty">No upcoming fixtures</div>'; return; }
+  let last = '';
+  document.getElementById('upcoming-body').innerHTML = up.map(m => {
     const d = fmtDate(m.utcDate);
-    const hdr = d !== lastDate ? `<div class="match-day-hdr">${d}</div>` : '';
-    lastDate = d;
-    return hdr + matchCard(m, standings);
+    const hdr = d!==last ? `<div class="mday">${d}</div>` : '';
+    last = d;
+    return hdr + matchRow(m, standings);
   }).join('');
-
-  document.getElementById('upcoming-matches').innerHTML = html;
 }
 
-
-
-// ── Render odds panel ─────────────────────────────────────────
-function renderOdds(matches) {
-  const todayM = matches.filter(m => isToday(m.utcDate) && (m.status==='TIMED'||m.status==='SCHEDULED'));
-  if(!todayM.length) {
-    document.getElementById('today-odds').innerHTML = '<div class="loading-msg">No upcoming matches today</div>';
-    return;
-  }
-
-  const ODDS = {
-    'Czechia':      {w:'-155', d:'+260', l:'+360', fav:'CZE'},
-    'Switzerland':  {w:'-130', d:'+240', l:'+380', fav:'SUI'},
-    'Canada':       {w:'-200', d:'+300', l:'+550', fav:'CAN'},
-    'Mexico':       {w:'-140', d:'+240', l:'+360', fav:'MEX'},
-  };
-
-  const html = todayM.map(m => {
-    const o = ODDS[m.homeTeam.name] || {w:'—',d:'—',l:'—',fav:m.homeTeam.tla};
-    return `<div style="padding:12px 14px;border-bottom:0.5px solid var(--border)">
-      <div style="font-size:11px;font-weight:500;color:var(--text);margin-bottom:8px">${m.homeTeam.name} vs ${m.awayTeam.name}</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center">
-        <div style="background:var(--bg3);border-radius:6px;padding:8px"><div style="font-size:16px;font-weight:700;color:var(--green)">${o.w}</div><div style="font-size:9px;color:var(--text3)">${m.homeTeam.tla} win</div></div>
-        <div style="background:var(--bg3);border-radius:6px;padding:8px"><div style="font-size:16px;font-weight:700;color:var(--yellow)">${o.d}</div><div style="font-size:9px;color:var(--text3)">Draw</div></div>
-        <div style="background:var(--bg3);border-radius:6px;padding:8px"><div style="font-size:16px;font-weight:700;color:var(--red)">${o.l}</div><div style="font-size:9px;color:var(--text3)">${m.awayTeam.tla} win</div></div>
-      </div>
-    </div>`;
-  }).join('');
-
-  document.getElementById('today-odds').innerHTML = html;
-}
-
-
-// ── Render visual bracket ────────────────────────────────────
-function renderBracket(groups) {
-  if (!groups || !groups.length) return;
-
-  // Build team map from API standings
-  const teamMap = {};
-  groups.forEach(grp => {
-    const name = grp.group || 'Group ?';
-    const letter = name.replace('Group ', '');
-    grp.table.forEach((t, i) => {
-      teamMap[letter + (i+1)] = t.team.shortName || t.team.tla || t.team.name;
-    });
-  });
-
-  function short(key) {
-    return teamMap[key] || key;
-  }
-
-  function match(top, bot, topSeed, botSeed) {
-    const tCls = topSeed === '1' ? 'seed1' : topSeed === '2' ? 'seed2' : '';
-    const bCls = botSeed === '1' ? 'seed1' : botSeed === '2' ? 'seed2' : '';
-    const tTbd = !teamMap[top] ? 'tbd-row' : '';
-    const bTbd = !teamMap[bot] ? 'tbd-row' : '';
-    const tName = teamMap[top] || top;
-    const bName = teamMap[bot] || bot;
-    return `<div class="br-match">
-      <div class="br-team ${tCls} ${tTbd}">
-        <span class="br-seed">${top.replace(/[A-Z]+/,'')}</span>
-        <span class="br-tname">${tName}</span>
-      </div>
-      <div class="br-team ${bCls} ${bTbd}">
-        <span class="br-seed">${bot.replace(/[A-Z]+/,'')}</span>
-        <span class="br-tname">${bName}</span>
-      </div>
-    </div>`;
-  }
-
-  function tbd() {
-    return `<div class="br-match">
-      <div class="br-team tbd-row"><span class="br-seed"></span><span class="br-tname" style="color:var(--text3)">TBD</span></div>
-      <div class="br-team tbd-row"><span class="br-seed"></span><span class="br-tname" style="color:var(--text3)">TBD</span></div>
-    </div>`;
-  }
-
-  function spacer(h) {
-    return `<div class="br-spacer" style="min-height:${h}px"></div>`;
-  }
-
-  // Groups column
-  const gEl = document.getElementById('br-groups');
-  if (gEl) {
-    gEl.innerHTML = groups.map(grp => {
-      const letter = (grp.group||'').replace('Group ','');
-      const t1 = grp.table[0], t2 = grp.table[1];
-      const n1 = t1 ? (t1.team.shortName||t1.team.tla||t1.team.name) : 'TBD';
-      const n2 = t2 ? (t2.team.shortName||t2.team.tla||t2.team.name) : 'TBD';
-      return `<div class="br-match">
-        <div class="br-team seed1">
-          <span class="br-seed" style="color:var(--green)">${letter}1</span>
-          <span class="br-tname">${n1}</span>
-        </div>
-        <div class="br-team seed2">
-          <span class="br-seed" style="color:var(--blue)">${letter}2</span>
-          <span class="br-tname" style="color:var(--blue)">${n2}</span>
-        </div>
-      </div>
-      ${spacer(3)}`;
-    }).join('');
-  }
-
-  // Round of 32 — 2026 bracket pairings (16 matches)
-  const r32pairs = [
-    ['A1','B2'],['A2','B1'],
-    ['C1','D2'],['C2','D1'],
-    ['E1','F2'],['E2','F1'],
-    ['G1','H2'],['G2','H1'],
-    ['I1','J2'],['I2','J1'],
-    ['K1','L2'],['K2','L1'],
-    ['B1','A2'],['B2','A1'],
-    ['D1','C2'],['D2','C1'],
-  ];
-  const r32El = document.getElementById('br-r32');
-  if (r32El) {
-    r32El.innerHTML = r32pairs.map(([t,b]) =>
-      match(t, b, t.slice(-1), b.slice(-1)) + spacer(3)
-    ).join('');
-  }
-
-  // Later rounds — all TBD
-  const r16El = document.getElementById('br-r16');
-  if (r16El) r16El.innerHTML = Array(8).fill(null).map(() => tbd() + spacer(11)).join('');
-
-  const qfEl = document.getElementById('br-qf');
-  if (qfEl) qfEl.innerHTML = Array(4).fill(null).map(() => tbd() + spacer(43)).join('');
-
-  const sfEl = document.getElementById('br-sf');
-  if (sfEl) sfEl.innerHTML = Array(2).fill(null).map(() => tbd() + spacer(139)).join('');
-
-  const finalEl = document.getElementById('br-final');
-  if (finalEl) {
-    finalEl.innerHTML = spacer(139) + tbd() + `<div style="text-align:center;font-size:9px;color:var(--gold);margin-top:4px">MetLife Stadium</div>`;
-  }
-
-  const badge = document.getElementById('bracket-md');
-  if (badge) badge.textContent = 'Group stage · ' + (groups[0]?.table[0]?.playedGames||0) + '/3 played';
-}
-
-
-
-// ── Render standings ──────────────────────────────────────────
 function renderStandings(groups) {
-  if(!groups||!groups.length) {
-    document.getElementById('standings-grid').innerHTML =
-      '<div class="panel"><div class="error-msg">Could not load standings</div></div>';
-    return;
-  }
-
-  const html = groups.map(grp => {
-    const rows = grp.table.map((t,i) => {
+  if (!groups.length) { document.getElementById('standings-grid').innerHTML = '<div class="panel"><div class="empty">No standings yet</div></div>'; return; }
+  document.getElementById('standings-grid').innerHTML = groups.map(g => {
+    const rows = g.table.map((t,i) => {
       const cls = i===0?'q1':i===1?'q2':i===2?'q3':'';
-      return `<div class="std-row ${cls}">
-        <span class="std-pos">${t.position}</span>
-        <span class="std-team">${t.team.name}</span>
-        <span class="std-num">${t.playedGames}</span>
-        <span class="std-num">${t.won}</span>
-        <span class="std-num">${t.draw}</span>
-        <span class="std-num">${t.lost}</span>
-        <span class="std-pts">${t.points}</span>
+      return `<div class="srow ${cls}">
+        <span class="spos">${t.position}</span>
+        <span class="steam">${t.team.shortName||t.team.name}</span>
+        <span class="snum">${t.playedGames}</span>
+        <span class="snum">${t.won}</span>
+        <span class="snum">${t.draw}</span>
+        <span class="snum">${t.lost}</span>
+        <span class="spts">${t.points}</span>
       </div>`;
     }).join('');
-
     return `<div class="panel">
-      <div class="grp-hdr"><span>${grp.group||'Group'}</span><span style="font-size:9px;color:var(--text3)">MD${grp.table[0]?.playedGames||0}</span></div>
+      <div class="grp-hdr"><span>${g.group||'Group'}</span><span style="font-size:9px;color:var(--text3)">MD${g.table[0]?.playedGames||0}/3</span></div>
       <div class="std-cols"><span>#</span><span>Team</span><span>P</span><span>W</span><span>D</span><span>L</span><span>Pts</span></div>
       ${rows}
     </div>`;
   }).join('');
-
-  document.getElementById('standings-grid').innerHTML = html;
 }
 
-// ── Render scorers ────────────────────────────────────────────
-function renderScorers(scorers) {
-  if(!scorers||!scorers.length) {
-    document.getElementById('scorers-list').innerHTML = '<div class="error-msg">Could not load scorers</div>';
-    return;
+function renderBracket(groups) {
+  const wrap = document.getElementById('bracket-wrap');
+  if (!wrap || !groups.length) return;
+
+  const tmap = {};
+  groups.forEach(g => {
+    const ltr = (g.group||'').replace('Group ','');
+    g.table.forEach((t,i) => { tmap[ltr+(i+1)] = t.team.shortName||t.team.tla||t.team.name; });
+  });
+
+  function bMatch(t, b) {
+    const tn = tmap[t]||t, bn = tmap[b]||b;
+    const tc = t.slice(-1)==='1'?'s1':'s2', bc = b.slice(-1)==='1'?'s1':'s2';
+    return `<div class="br-match">
+      <div class="br-team ${tc}"><span class="br-seed">${t.replace(/[A-Z]+/,'')}</span><span class="br-tname">${tn}</span></div>
+      <div class="br-team ${bc}"><span class="br-seed">${b.replace(/[A-Z]+/,'')}</span><span class="br-tname">${bn}</span></div>
+    </div>`;
+  }
+  function tbd() {
+    return `<div class="br-match"><div class="br-team"><span class="br-seed"></span><span class="br-tname" style="color:var(--text3)">TBD</span></div><div class="br-team"><span class="br-seed"></span><span class="br-tname" style="color:var(--text3)">TBD</span></div></div>`;
+  }
+  function sp(h) { return `<div style="min-height:${h}px"></div>`; }
+  function col(hdr, content) {
+    return `<div style="flex-shrink:0"><div class="br-rnd-hdr">${hdr}</div><div style="display:flex;flex-direction:column;gap:2px;padding:0 3px">${content}</div></div>`;
   }
 
-  document.getElementById('scorers-badge').textContent = 'Top ' + scorers.length;
+  const r32 = [['A1','B2'],['A2','B1'],['C1','D2'],['C2','D1'],['E1','F2'],['E2','F1'],['G1','H2'],['G2','H1'],['I1','J2'],['I2','J1'],['K1','L2'],['K2','L1'],['B1','A2'],['B2','A1'],['D1','C2'],['D2','C1']];
 
-  let totalGoals = 0, totalPlayed = 0;
+  wrap.innerHTML =
+    col('Groups', groups.map(g => { const ltr=(g.group||'').replace('Group ',''); const n1=g.table[0]?.team.shortName||g.table[0]?.team.name||'?', n2=g.table[1]?.team.shortName||g.table[1]?.team.name||'?';
+      return `<div class="br-match"><div class="br-team s1"><span class="br-seed" style="color:var(--green)">${ltr}1</span><span class="br-tname">${n1}</span></div><div class="br-team s2"><span class="br-seed" style="color:var(--blue)">${ltr}2</span><span class="br-tname" style="color:var(--blue)">${n2}</span></div></div>${sp(2)}`; }).join('')) +
+    col('Round of 32', r32.map(([t,b]) => bMatch(t,b)+sp(2)).join('')) +
+    col('Round of 16', Array(8).fill(tbd()+sp(10)).join('')) +
+    col('Quarterfinals', Array(4).fill(tbd()+sp(42)).join('')) +
+    col('Semifinals', Array(2).fill(tbd()+sp(138)).join('')) +
+    col('Final · Jul 19', sp(138)+tbd()+'<div style="text-align:center;font-size:9px;color:var(--gold);margin-top:4px">MetLife Stadium</div>');
 
-  const medals = ['🥇','🥈','🥉'];
-  const html = scorers.map((s,i) => {
-    totalGoals += s.goals||0;
-    totalPlayed++;
-    const rank = i < 3 ? `<span style="font-size:14px">${medals[i]}</span>` :
-      `<span class="boot-rank">${i+1}</span>`;
-    return `<div class="boot-row">
-      ${rank}
-      <div style="flex:1">
-        <div class="boot-player">${s.player.name}</div>
-        <div class="boot-team">${s.team.name}</div>
-      </div>
-      <div class="boot-goals">${s.goals}</div>
-    </div>`;
-  }).join('');
-
-  document.getElementById('scorers-list').innerHTML = html;
-
-  // Update stats
-  const played = document.getElementById('stat-played');
-  const goals = document.getElementById('stat-goals');
-  const avg = document.getElementById('stat-avg');
-  if(played) played.textContent = '—';
-  if(goals) goals.textContent = '55+';
-  if(avg) avg.textContent = '3.1';
+  const badge = document.getElementById('bracket-badge');
+  if (badge) badge.textContent = 'Group stage · '+(groups[0]?.table[0]?.playedGames||0)+'/3';
 }
 
-// ── Cached standings for points display ─────────────────────
-let cachedStandings = [];
-
-
-
+function renderScorers(scorers) {
+  if (!scorers.length) { document.getElementById('boot-body').innerHTML = '<div class="empty">No scorer data yet</div>'; return; }
+  document.getElementById('boot-badge').textContent = 'Top '+scorers.length;
+  const medals = ['🥇','🥈','🥉'];
+  document.getElementById('boot-body').innerHTML = scorers.map((s,i) =>
+    `<div class="brow">
+      ${i<3?`<span style="font-size:14px;width:20px">${medals[i]}</span>`:`<span class="brank">${i+1}</span>`}
+      <div style="flex:1"><div class="bplayer">${s.player.name}</div><div class="bteam">${s.team.name}</div></div>
+      <div class="bgoals">${s.goals}</div>
+    </div>`).join('');
+}
 
 function renderNews(articles) {
-  if (!articles || !articles.length) {
-    const msg = '<div class="empty-state" style="padding:20px;text-align:center;color:var(--text3);font-size:12px">No news articles available yet — GitHub Action will update shortly</div>';
-    ['today-news-body','news-tab-body'].forEach(id => { const el = document.getElementById(id); if(el) el.innerHTML = msg; });
-    return;
-  }
-
-  ['news-badge','news-tab-badge'].forEach(id => { const el = document.getElementById(id); if(el) el.textContent = articles.length + ' articles'; });
-
-  const html = articles.map(a => {
-    const src  = a.source?.name || a.source || 'News';
-    const agoMs = Date.now() - new Date(a.publishedAt).getTime();
-    const agoMin = Math.floor(agoMs / 60000);
-    const ago = agoMin < 60 ? agoMin + 'm ago'
-      : agoMin < 1440 ? Math.floor(agoMin/60) + 'h ago'
-      : Math.floor(agoMin/1440) + 'd ago';
-    const img  = a.image || a.urlToImage || a.thumbnail
-      ? `<img src="${a.urlToImage}" style="width:44px;height:44px;border-radius:var(--radius-sm);object-fit:cover;flex-shrink:0" onerror="this.style.display='none'">`
-      : `<div style="width:44px;height:44px;border-radius:var(--radius-sm);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">⚽</div>`;
-    return `<a class="news-row" href="${a.url}" target="_blank" rel="noopener">
-      ${img}
-      <div style="flex:1;min-width:0">
-        <div class="news-hl">${a.title}</div>
-        <div class="news-meta"><span class="news-src">${src}</span><span>· ${ago}</span></div>
-      </div>
-    </a>`;
-  }).join('');
-
-  ['today-news-body', 'news-tab-body'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = html;
-  });
+  const html = articles.length
+    ? articles.map(a => {
+        const t = ago(a.publishedAt);
+        const img = a.image ? `<img src="${a.image}" style="width:42px;height:42px;border-radius:6px;object-fit:cover;flex-shrink:0" onerror="this.style.display='none'">` : `<div style="width:42px;height:42px;border-radius:6px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">⚽</div>`;
+        return `<a class="nrow" href="${a.url}" target="_blank" rel="noopener">${img}<div style="flex:1;min-width:0"><div class="nhl">${a.title}</div><div class="nmeta"><span class="nsrc">${a.source||'News'}</span> · ${t}</div></div></a>`;
+      }).join('')
+    : '<div class="empty">No news available yet</div>';
+  ['news-today-body','news-tab-body'].forEach(id => { const el=document.getElementById(id); if(el) el.innerHTML=html; });
+  ['news-badge','news-tab-badge'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=articles.length+' articles'; });
 }
 
-// ── Main fetch — reads data.json written by GitHub Action ────
-async function fetchAll(bustCache) {
+function renderOdds(matches, standings) {
+  const today = matches.filter(m => isToday(m.utcDate) && (m.status==='TIMED'||m.status==='SCHEDULED'));
+  if (!today.length) { document.getElementById('odds-body').innerHTML = '<div class="empty">No upcoming matches today</div>'; return; }
+  const ODDS = { 'Czechia':{w:'-155',d:'+260',l:'+360'}, 'Switzerland':{w:'-130',d:'+240',l:'+380'}, 'Canada':{w:'-200',d:'+300',l:'+550'}, 'Mexico':{w:'-140',d:'+240',l:'+360'} };
+  document.getElementById('odds-body').innerHTML = today.map(m => {
+    const o = ODDS[m.homeTeam.name] || {w:'—',d:'—',l:'—'};
+    return `<div style="padding:10px 13px;border-bottom:0.5px solid var(--border)">
+      <div style="font-size:11px;font-weight:500;color:var(--text);margin-bottom:7px">${m.homeTeam.name} vs ${m.awayTeam.name}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;text-align:center">
+        <div style="background:var(--bg3);border-radius:6px;padding:7px"><div style="font-size:15px;font-weight:700;color:var(--green)">${o.w}</div><div style="font-size:9px;color:var(--text3)">${m.homeTeam.tla} win</div></div>
+        <div style="background:var(--bg3);border-radius:6px;padding:7px"><div style="font-size:15px;font-weight:700;color:var(--yellow)">${o.d}</div><div style="font-size:9px;color:var(--text3)">Draw</div></div>
+        <div style="background:var(--bg3);border-radius:6px;padding:7px"><div style="font-size:15px;font-weight:700;color:var(--red)">${o.l}</div><div style="font-size:9px;color:var(--text3)">${m.awayTeam.tla} win</div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Load data.json ────────────────────────────────────────────
+async function loadAll() {
   try {
-    const d = await loadData(bustCache);
-    const matches  = (Array.isArray(d.matches) ? d.matches : d.matches?.matches || []);
-    const groups   = (Array.isArray(d.standings) ? d.standings : (d.standings?.standings || []).filter(s => s.type === 'TOTAL'));
-    const scorers  = (Array.isArray(d.scorers) ? d.scorers : d.scorers?.scorers || []);
-    const articles = (d.articles || d.news?.articles || []);
-    const updated  = d.updated;
+    const res = await fetch('./data.json?t=' + Date.now());
+    if (!res.ok) throw new Error('data.json not found — run the GitHub Action first');
+    const d = await res.json();
 
-    window._lastMatches = matches;
-    cachedStandings     = groups;
+    const matches   = Array.isArray(d.matches)   ? d.matches   : d.matches?.matches   || [];
+    const standings = Array.isArray(d.standings) ? d.standings : (d.standings?.standings||[]).filter(s=>s.type==='TOTAL');
+    const scorers   = Array.isArray(d.scorers)   ? d.scorers   : d.scorers?.scorers   || [];
+    const articles  = d.articles || d.news?.articles || [];
 
-    if (updated) {
-      const t = new Date(updated);
-      document.getElementById('last-update').textContent =
-        'Data updated ' + t.toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'});
+    cachedStandings = standings;
+
+    if (d.updated) {
+      document.getElementById('js-upd').textContent = 'Updated ' + new Date(d.updated).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
     }
 
     renderTicker(matches);
-    renderToday(matches, groups);
-    renderUpcoming(matches, groups);
-    renderOdds(matches);
-    renderStandings(groups);
-    renderBracket(groups);
+    renderToday(matches, standings);
+    renderUpcoming(matches, standings);
+    renderStandings(standings);
+    renderBracket(standings);
     renderScorers(scorers);
     renderNews(articles);
+    renderOdds(matches, standings);
 
-    const played = matches.filter(m => m.status === 'FINISHED').length;
-    const goals  = matches.filter(m => m.status === 'FINISHED')
-      .reduce((s, m) => s + (m.score?.fullTime?.home||0) + (m.score?.fullTime?.away||0), 0);
-    const sp = document.getElementById('stat-played');
-    const sg = document.getElementById('stat-goals');
-    const sa = document.getElementById('stat-avg');
-    if (sp) sp.textContent = played;
-    if (sg) sg.textContent = goals;
-    if (sa) sa.textContent = played ? (goals/played).toFixed(1) : '—';
+    const played = matches.filter(m=>m.status==='FINISHED').length;
+    const goals  = matches.filter(m=>m.status==='FINISHED').reduce((s,m)=>s+(m.score?.fullTime?.home||0)+(m.score?.fullTime?.away||0),0);
+    const sp=document.getElementById('stat-played'), sg=document.getElementById('stat-goals'), sa=document.getElementById('stat-avg');
+    if(sp) sp.textContent=played;
+    if(sg) sg.textContent=goals;
+    if(sa) sa.textContent=played?(goals/played).toFixed(1):'—';
 
   } catch(e) {
-    console.error('Data load error:', e);
-    document.getElementById('today-matches').innerHTML =
-      `<div class="error-msg">⚠ ${e.message} — GitHub Action may not have run yet. Go to Actions tab and run manually.</div>`;
+    console.error(e);
+    document.getElementById('today-body').innerHTML = `<div class="err-msg">⚠ ${e.message}</div>`;
   }
 }
 
-
-
-
-
-
-
-// ── Refresh all ───────────────────────────────────────────────
-async function refreshAll() {
-  await fetchAll();
-}
-
-// ── Tab switching ─────────────────────────────────────────────
+// ── Tabs ──────────────────────────────────────────────────────
 document.querySelectorAll('.ntab').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.ntab').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.ntab').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-section').forEach(s=>s.classList.remove('active'));
     btn.classList.add('active');
-    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
   });
 });
 
-// ── Check for new data.json every 60 seconds ──────────────────
-let countdown = CONFIG.REFRESH_INTERVAL / 1000;
-setInterval(() => {
-  countdown--;
-  if(countdown <= 0) {
-    countdown = CONFIG.REFRESH_INTERVAL / 1000;
-    fetchAll(true);
-  }
-}, 1000);
+// ── Auto-refresh every 60s ────────────────────────────────────
+setInterval(loadAll, 60000);
 
 // ── Init ──────────────────────────────────────────────────────
-// Phase 1: Render instantly from embedded snapshot (zero network requests)
-fetchAll(false);
-// Phase 2: After 3s silently check for newer data.json in background
-setTimeout(() => fetchAll(true), 3000);
+loadAll();
 </script>
 </body>
 </html>
