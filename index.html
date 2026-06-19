@@ -515,32 +515,14 @@ async function apiFetch(endpoint) {
   if(wait > 0) await new Promise(r => setTimeout(r, wait));
   lastFetch = Date.now();
 
-  // Try proxies in order until one works
   const target = CONFIG.BASE_URL + endpoint;
-  const proxies = [
-    'https://corsproxy.io/?' + encodeURIComponent(target),
-    'https://proxy.cors.sh/' + target,
-    'https://cors-anywhere.herokuapp.com/' + target,
-  ];
-
-  let lastErr;
-  for (const url of proxies) {
-    try {
-      const res = await fetch(url, {
-        headers: {
-          'X-Auth-Token': CONFIG.API_KEY,
-          'X-Requested-With': 'XMLHttpRequest'
-        }
-      });
-      if (res.status === 429) throw new Error('Rate limit hit');
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      return await res.json();
-    } catch(e) {
-      console.warn('Proxy failed:', url, e.message);
-      lastErr = e;
-    }
-  }
-  throw new Error('All proxies failed: ' + lastErr.message);
+  const url = 'https://corsfix.com/' + target;
+  const res = await fetch(url, {
+    headers: { 'X-Auth-Token': CONFIG.API_KEY }
+  });
+  if(res.status === 429) throw new Error('Rate limit hit — try again in a minute');
+  if(!res.ok) throw new Error('API error ' + res.status);
+  return res.json();
 }
 
 // ── Render ticker ──────────────────────────────────────────────
@@ -887,9 +869,9 @@ let cachedStandings = [];
 // ── Fetch live news from NewsAPI ──────────────────────────────
 async function fetchNews() {
   try {
-    // GNews supports CORS from browsers — no proxy needed
     const query = encodeURIComponent('"World Cup 2026" OR "FIFA 2026"');
-    const url = `https://gnews.io/api/v4/search?q=${query}&lang=en&max=12&sortby=publishedAt&token=${CONFIG.NEWS_API_KEY}`;
+    const target = `https://gnews.io/api/v4/search?q=${query}&lang=en&max=12&sortby=publishedAt&token=${CONFIG.NEWS_API_KEY}`;
+    const url = 'https://corsfix.com/' + target;
     const res = await fetch(url);
     if (!res.ok) throw new Error('News fetch failed ' + res.status);
     const data = await res.json();
