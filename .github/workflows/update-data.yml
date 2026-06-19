@@ -22,25 +22,17 @@ jobs:
           curl -s -H "X-Auth-Token: $FOOTBALL_KEY" "https://api.football-data.org/v4/competitions/WC/standings" -o standings_raw.json
           curl -s -H "X-Auth-Token: $FOOTBALL_KEY" "https://api.football-data.org/v4/competitions/WC/scorers?limit=15" -o scorers_raw.json
 
-      - name: Build data.json (preserve existing news)
+      - name: Build data.json
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
-
             const raw_m  = JSON.parse(fs.readFileSync('matches_raw.json',   'utf8'));
             const raw_st = JSON.parse(fs.readFileSync('standings_raw.json', 'utf8'));
             const raw_sc = JSON.parse(fs.readFileSync('scorers_raw.json',   'utf8'));
 
-            // Preserve existing articles from data.json if present
-            let articles = [];
-            try {
-              const existing = JSON.parse(fs.readFileSync('data.json', 'utf8'));
-              articles = existing.articles || [];
-            } catch(e) { articles = []; }
-
             const matches = (raw_m.matches || []).map(m => ({
-              utcDate:  m.utcDate, status: m.status, group: m.group, stage: m.stage,
+              utcDate: m.utcDate, status: m.status, group: m.group, stage: m.stage,
               homeTeam: { name: m.homeTeam.name, shortName: m.homeTeam.shortName, tla: m.homeTeam.tla },
               awayTeam: { name: m.awayTeam.name, shortName: m.awayTeam.shortName, tla: m.awayTeam.tla },
               score: m.score
@@ -63,9 +55,16 @@ jobs:
               team: { name: s.team.name, shortName: s.team.shortName }
             }));
 
+            // Read existing articles if available, otherwise empty
+            let articles = [];
+            try {
+              const d = JSON.parse(fs.readFileSync('data.json', 'utf8'));
+              articles = Array.isArray(d.articles) ? d.articles : [];
+            } catch(e) {}
+
             const out = { updated: new Date().toISOString(), matches, standings, scorers, articles };
             fs.writeFileSync('data.json', JSON.stringify(out));
-            console.log('Written:', matches.length, 'matches,', articles.length, 'articles (preserved)');
+            console.log('OK:', matches.length, 'matches,', articles.length, 'articles');
 
       - name: Commit
         run: |
@@ -73,6 +72,6 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data.json
           git diff --staged --quiet && echo "No changes" && exit 0
-          git commit -m "scores: update $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git commit -m "scores: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
           git pull --rebase origin main
           git push
