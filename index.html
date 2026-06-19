@@ -958,10 +958,10 @@ function renderNews(articles) {
 async function fetchAll() {
   try {
     const d = await loadData();
-    const matches  = (d.matches   || []);
-    const groups   = (d.standings  || []);
-    const scorers  = (d.scorers   || []);
-    const articles = (d.articles  || []);
+    const matches  = (Array.isArray(d.matches) ? d.matches : d.matches?.matches || []);
+    const groups   = (Array.isArray(d.standings) ? d.standings : (d.standings?.standings || []).filter(s => s.type === 'TOTAL'));
+    const scorers  = (Array.isArray(d.scorers) ? d.scorers : d.scorers?.scorers || []);
+    const articles = (d.articles || d.news?.articles || []);
     const updated  = d.updated;
 
     window._lastMatches = matches;
