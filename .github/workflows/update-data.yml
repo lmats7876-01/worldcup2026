@@ -83,16 +83,20 @@ jobs:
               articles
             };
 
-            // Read template, inject data snapshot
+            // Use JSON.stringify then encode as base64 to avoid any quote/escape issues in HTML
+            const json = JSON.stringify(data);
+            const b64  = Buffer.from(json).toString('base64');
+
             let html = fs.readFileSync('index.template.html', 'utf8');
-            const snapshot = JSON.stringify(data);
-            html = html.replace('/*SNAPSHOT_PLACEHOLDER*/', 'window.WC_SNAPSHOT = ' + snapshot + ';');
+            // Inject as base64 — 100% safe, no quote issues
+            html = html.replace(
+              '/*SNAPSHOT_PLACEHOLDER*/',
+              `window.WC_SNAPSHOT = JSON.parse(atob("${b64}"));`
+            );
             fs.writeFileSync('index.html', html);
+            fs.writeFileSync('data.json', json);
 
-            // Also write data.json as backup
-            fs.writeFileSync('data.json', snapshot);
-
-            console.log('Built index.html with', matches.length, 'matches,', articles.length, 'articles');
+            console.log('Built index.html:', Math.round(json.length/1024) + 'KB,', matches.length, 'matches,', articles.length, 'articles');
 
       - name: Commit
         run: |
