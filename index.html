@@ -501,9 +501,10 @@ function scoreStr(m) {
 
 
 // ── API fetch with rate-limit handling ─────────────────────────
-// ── Fetch all data from data.json (GitHub Action keeps it fresh) ──
-async function loadData() {
-  const res = await fetch('./data.json?t=' + Date.now());
+// ── Load data.json — instant from cache, then refresh in background ──
+async function loadData(bustCache) {
+  const url = bustCache ? './data.json?t=' + Date.now() : './data.json';
+  const res = await fetch(url);
   if (!res.ok) throw new Error('Could not load data.json');
   return res.json();
 }
@@ -955,9 +956,9 @@ function renderNews(articles) {
 }
 
 // ── Main fetch — reads data.json written by GitHub Action ────
-async function fetchAll() {
+async function fetchAll(bustCache) {
   try {
-    const d = await loadData();
+    const d = await loadData(bustCache);
     const matches  = (Array.isArray(d.matches) ? d.matches : d.matches?.matches || []);
     const groups   = (Array.isArray(d.standings) ? d.standings : (d.standings?.standings || []).filter(s => s.type === 'TOTAL'));
     const scorers  = (Array.isArray(d.scorers) ? d.scorers : d.scorers?.scorers || []);
@@ -1026,12 +1027,15 @@ setInterval(() => {
   countdown--;
   if(countdown <= 0) {
     countdown = CONFIG.REFRESH_INTERVAL / 1000;
-    refreshAll();
+    fetchAll(true);
   }
 }, 1000);
 
 // ── Init ──────────────────────────────────────────────────────
-refreshAll();
+// Phase 1: Load instantly from browser cache (no cache-busting)
+fetchAll(false);
+// Phase 2: After 2s, silently fetch fresh data in background
+setTimeout(() => fetchAll(true), 2000);
 </script>
 </body>
 </html>
