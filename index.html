@@ -542,45 +542,143 @@ function renderStandings(groups) {
   }).join('');
 }
 
-function renderBracket(groups) {
+function renderBracket(groups, matches) {
   const wrap = document.getElementById('bracket-wrap');
-  if (!wrap || !groups.length) return;
+  if (!wrap) return;
 
+  // Build team map from standings
   const tmap = {};
-  groups.forEach(g => {
-    const ltr = (g.group||'').replace('Group ','');
-    g.table.forEach((t,i) => { tmap[ltr+(i+1)] = t.team.shortName||t.team.tla||t.team.name; });
+  (groups || []).forEach(g => {
+    const ltr = (g.group || '').replace('Group ', '');
+    (g.table || []).forEach((t, i) => {
+      tmap[ltr + (i + 1)] = t.team.shortName || t.team.tla || t.team.name || '?';
+    });
   });
 
-  function bMatch(t, b) {
-    const tn = tmap[t]||t, bn = tmap[b]||b;
-    const tc = t.slice(-1)==='1'?'s1':'s2', bc = b.slice(-1)==='1'?'s1':'s2';
-    return `<div class="br-match">
-      <div class="br-team ${tc}"><span class="br-seed">${t.replace(/[A-Z]+/,'')}</span><span class="br-tname">${tn}</span></div>
-      <div class="br-team ${bc}"><span class="br-seed">${b.replace(/[A-Z]+/,'')}</span><span class="br-tname">${bn}</span></div>
-    </div>`;
-  }
-  function tbd() {
-    return `<div class="br-match"><div class="br-team"><span class="br-seed"></span><span class="br-tname" style="color:var(--text3)">TBD</span></div><div class="br-team"><span class="br-seed"></span><span class="br-tname" style="color:var(--text3)">TBD</span></div></div>`;
-  }
-  function sp(h) { return `<div style="min-height:${h}px"></div>`; }
-  function col(hdr, content) {
-    return `<div style="flex-shrink:0"><div class="br-rnd-hdr">${hdr}</div><div style="display:flex;flex-direction:column;gap:2px;padding:0 3px">${content}</div></div>`;
+  // Build knockout match map from API data
+  const koMatches = {};
+  (matches || []).filter(m => m.stage !== 'GROUP_STAGE').forEach(m => {
+    if (!koMatches[m.stage]) koMatches[m.stage] = [];
+    koMatches[m.stage].push(m);
+  });
+
+  const hasKoTeams = (stage) => {
+    const ms = koMatches[stage] || [];
+    return ms.length > 0 && ms.some(m => m.homeTeam?.name);
+  };
+
+  function teamName(m, side) {
+    const t = side === 'home' ? m.homeTeam : m.awayTeam;
+    if (!t || !t.name) return 'TBD';
+    return t.shortName || t.tla || t.name;
   }
 
-  const r32 = [['A1','B2'],['A2','B1'],['C1','D2'],['C2','D1'],['E1','F2'],['E2','F1'],['G1','H2'],['G2','H1'],['I1','J2'],['I2','J1'],['K1','L2'],['K2','L1'],['B1','A2'],['B2','A1'],['D1','C2'],['D2','C1']];
+  function scoreLabel(m) {
+    if (!m.score) return '';
+    const ft = m.score.fullTime;
+    if (ft && ft.home !== null && ft.home !== undefined) return ft.home + '–' + ft.away;
+    return '';
+  }
+
+  function matchBox(home, away, score, stage) {
+    const isDone = score !== '';
+    const homeCls = isDone ? ' style="font-weight:600"' : '';
+    return '<div class="br-match">' +
+      '<div class="br-team s1"><span class="br-seed"></span><span class="br-tname"' + homeCls + '>' + home + '</span>' + (score ? '<span style="font-size:10px;color:var(--green);margin-left:4px">' + score.split('–')[0] + '</span>' : '') + '</div>' +
+      '<div class="br-team s2"><span class="br-seed"></span><span class="br-tname">' + away + '</span>' + (score ? '<span style="font-size:10px;color:var(--green);margin-left:4px">' + score.split('–')[1] + '</span>' : '') + '</div>' +
+      '</div>';
+  }
+
+  function tbd() {
+    return '<div class="br-match"><div class="br-team"><span class="br-seed"></span><span class="br-tname" style="color:var(--text3)">TBD</span></div><div class="br-team"><span class="br-seed"></span><span class="br-tname" style="color:var(--text3)">TBD</span></div></div>';
+  }
+
+  function sp(h) { return '<div style="min-height:' + h + 'px"></div>'; }
+
+  function col(hdr, content, color) {
+    return '<div style="flex-shrink:0"><div class="br-rnd-hdr"' + (color ? ' style="color:' + color + '"' : '') + '>' + hdr + '</div>' +
+      '<div style="display:flex;flex-direction:column;gap:2px;padding:0 3px">' + content + '</div></div>';
+  }
+
+  // Groups column
+  const groupsHtml = (groups || []).map(g => {
+    const ltr = (g.group || '').replace('Group ', '');
+    const n1 = g.table[0]?.team.shortName || g.table[0]?.team.name || '?';
+    const n2 = g.table[1]?.team.shortName || g.table[1]?.team.name || '?';
+    return '<div class="br-match">' +
+      '<div class="br-team s1"><span class="br-seed" style="color:var(--green)">' + ltr + '1</span><span class="br-tname">' + n1 + '</span></div>' +
+      '<div class="br-team s2"><span class="br-seed" style="color:var(--blue)">' + ltr + '2</span><span class="br-tname" style="color:var(--blue)">' + n2 + '</span></div>' +
+      '</div>' + sp(2);
+  }).join('');
+
+  // Round of 32
+  const r32Matches = koMatches['LAST_32'] || [];
+  const r32UseReal = hasKoTeams('LAST_32');
+  const r32Projected = [
+    ['A1','B2'],['A2','B1'],['C1','D2'],['C2','D1'],
+    ['E1','F2'],['E2','F1'],['G1','H2'],['G2','H1'],
+    ['I1','J2'],['I2','J1'],['K1','L2'],['K2','L1'],
+    ['B1','A2'],['B2','A1'],['D1','C2'],['D2','C1']
+  ];
+
+  let r32Html = '';
+  if (r32UseReal) {
+    r32Html = r32Matches.map(m =>
+      matchBox(teamName(m,'home'), teamName(m,'away'), scoreLabel(m), 'LAST_32') + sp(2)
+    ).join('');
+  } else {
+    r32Html = r32Projected.map(([t, b]) =>
+      matchBox(tmap[t] || t, tmap[b] || b, '', 'LAST_32') + sp(2)
+    ).join('');
+  }
+
+  // Round of 16
+  const r16Matches = koMatches['LAST_16'] || [];
+  const r16UseReal = hasKoTeams('LAST_16');
+  const r16Html = r16UseReal
+    ? r16Matches.map(m => matchBox(teamName(m,'home'), teamName(m,'away'), scoreLabel(m), 'LAST_16') + sp(10)).join('')
+    : Array(8).fill(tbd() + sp(10)).join('');
+
+  // Quarterfinals
+  const qfMatches = koMatches['QUARTER_FINALS'] || [];
+  const qfUseReal = hasKoTeams('QUARTER_FINALS');
+  const qfHtml = qfUseReal
+    ? qfMatches.map(m => matchBox(teamName(m,'home'), teamName(m,'away'), scoreLabel(m), 'QF') + sp(42)).join('')
+    : Array(4).fill(tbd() + sp(42)).join('');
+
+  // Semifinals
+  const sfMatches = koMatches['SEMI_FINALS'] || [];
+  const sfUseReal = hasKoTeams('SEMI_FINALS');
+  const sfHtml = sfUseReal
+    ? sfMatches.map(m => matchBox(teamName(m,'home'), teamName(m,'away'), scoreLabel(m), 'SF') + sp(138)).join('')
+    : Array(2).fill(tbd() + sp(138)).join('');
+
+  // Final
+  const finalMatch = (koMatches['FINAL'] || [])[0];
+  const finalHtml = sp(138) +
+    (finalMatch && finalMatch.homeTeam?.name
+      ? matchBox(teamName(finalMatch,'home'), teamName(finalMatch,'away'), scoreLabel(finalMatch), 'FINAL')
+      : tbd()) +
+    '<div style="text-align:center;font-size:9px;color:var(--gold);margin-top:4px">MetLife Stadium</div>';
+
+  // Determine badge
+  const badge = document.getElementById('bracket-badge');
+  let stage = 'Group stage';
+  if (hasKoTeams('FINAL')) stage = 'Final';
+  else if (hasKoTeams('SEMI_FINALS')) stage = 'Semifinals';
+  else if (hasKoTeams('QUARTER_FINALS')) stage = 'Quarterfinals';
+  else if (hasKoTeams('LAST_16')) stage = 'Round of 16';
+  else if (r32UseReal) stage = 'Round of 32';
+  else stage = 'Group stage · ' + (groups[0]?.table[0]?.playedGames || 0) + '/3';
+  if (badge) badge.textContent = stage;
 
   wrap.innerHTML =
-    col('Groups', groups.map(g => { const ltr=(g.group||'').replace('Group ',''); const n1=g.table[0]?.team.shortName||g.table[0]?.team.name||'?', n2=g.table[1]?.team.shortName||g.table[1]?.team.name||'?';
-      return `<div class="br-match"><div class="br-team s1"><span class="br-seed" style="color:var(--green)">${ltr}1</span><span class="br-tname">${n1}</span></div><div class="br-team s2"><span class="br-seed" style="color:var(--blue)">${ltr}2</span><span class="br-tname" style="color:var(--blue)">${n2}</span></div></div>${sp(2)}`; }).join('')) +
-    col('Round of 32', r32.map(([t,b]) => bMatch(t,b)+sp(2)).join('')) +
-    col('Round of 16', Array(8).fill(tbd()+sp(10)).join('')) +
-    col('Quarterfinals', Array(4).fill(tbd()+sp(42)).join('')) +
-    col('Semifinals', Array(2).fill(tbd()+sp(138)).join('')) +
-    col('Final · Jul 19', sp(138)+tbd()+'<div style="text-align:center;font-size:9px;color:var(--gold);margin-top:4px">MetLife Stadium</div>');
-
-  const badge = document.getElementById('bracket-badge');
-  if (badge) badge.textContent = 'Group stage · '+(groups[0]?.table[0]?.playedGames||0)+'/3';
+    col('Groups', groupsHtml) +
+    col('Round of 32', r32Html) +
+    col('Round of 16', r16Html) +
+    col('Quarterfinals', qfHtml) +
+    col('Semifinals', sfHtml) +
+    col('Final · Jul 19', finalHtml, 'var(--gold)');
 }
 
 function renderScorers(scorers) {
@@ -650,7 +748,7 @@ async function loadAll() {
     renderToday(matches, standings);
     renderUpcoming(matches, standings);
     renderStandings(standings);
-    renderBracket(standings);
+    renderBracket(standings, matches);
     renderScorers(scorers);
     renderNews(articles);
     renderOdds(matches, standings);
