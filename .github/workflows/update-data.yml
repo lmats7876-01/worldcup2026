@@ -14,6 +14,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Pull latest data.json
+        run: git pull --rebase origin main
+
       - name: Fetch scores and standings
         env:
           FOOTBALL_KEY: ${{ secrets.FOOTBALL_API_KEY }}
@@ -22,8 +25,39 @@ jobs:
           curl -s -H "X-Auth-Token: $FOOTBALL_KEY" "https://api.football-data.org/v4/competitions/WC/standings" -o standings_raw.json
           curl -s -H "X-Auth-Token: $FOOTBALL_KEY" "https://api.football-data.org/v4/competitions/WC/scorers?limit=15" -o scorers_raw.json
 
-      - name: Pull latest data.json
-        run: git pull origin main
+      - name: Fetch last 5 match details
+        env:
+          FOOTBALL_KEY: ${{ secrets.FOOTBALL_API_KEY }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const exec = require('util').promisify(require('child_process').exec);
+
+            const raw = JSON.parse(fs.readFileSync('matches_raw.json', 'utf8'));
+            const finished = (raw.matches || [])
+              .filter(m => m.status === 'FINISHED')
+              .sort((a, b) => new Date(b.utcDate) - new Date(a.utcDate))
+              .slice(0, 5);
+
+            const details = [];
+            for (const m of finished) {
+              try {
+                const { stdout } = await exec(
+                  `curl -s -H "X-Auth-Token: ${process.env.FOOTBALL_KEY}" "https://api.football-data.org/v4/matches/${m.id}"`
+                );
+                const detail = JSON.parse(stdout);
+                details.push(detail);
+                console.log('Fetched:', m.homeTeam.name, 'vs', m.awayTeam.name, '— goals:', detail.goals?.length || 0);
+                // Small delay to avoid rate limit
+                await new Promise(r => setTimeout(r, 700));
+              } catch(e) {
+                console.log('Failed match', m.id, e.message);
+              }
+            }
+
+            fs.writeFileSync('match_details.json', JSON.stringify(details));
+            console.log('Saved', details.length, 'match details');
 
       - name: Build data.json
         uses: actions/github-script@v7
@@ -35,7 +69,7 @@ jobs:
             const raw_sc = JSON.parse(fs.readFileSync('scorers_raw.json',   'utf8'));
 
             const matches = (raw_m.matches || []).map(m => ({
-              utcDate: m.utcDate, status: m.status, group: m.group, stage: m.stage,
+              utcDate: m.utcDate, status: m.status, group: m.group, stage: m.stage, id: m.id,
               homeTeam: { name: m.homeTeam.name, shortName: m.homeTeam.shortName, tla: m.homeTeam.tla },
               awayTeam: { name: m.awayTeam.name, shortName: m.awayTeam.shortName, tla: m.awayTeam.tla },
               score: m.score
@@ -58,16 +92,35 @@ jobs:
               team: { name: s.team.name, shortName: s.team.shortName }
             }));
 
-            // Read existing articles if available, otherwise empty
+            // Preserve existing articles
             let articles = [];
             try {
               const d = JSON.parse(fs.readFileSync('data.json', 'utf8'));
               articles = Array.isArray(d.articles) ? d.articles : [];
             } catch(e) {}
 
-            const out = { updated: new Date().toISOString(), matches, standings, scorers, articles };
+            // Read match details
+            let matchDetails = [];
+            try {
+              const raw = JSON.parse(fs.readFileSync('match_details.json', 'utf8'));
+              matchDetails = raw.map(m => ({
+                id: m.id, utcDate: m.utcDate, status: m.status,
+                group: m.group, stage: m.stage,
+                homeTeam: { name: m.homeTeam?.name, shortName: m.homeTeam?.shortName, tla: m.homeTeam?.tla },
+                awayTeam: { name: m.awayTeam?.name, shortName: m.awayTeam?.shortName, tla: m.awayTeam?.tla },
+                score: m.score,
+                goals: (m.goals || []).map(g => ({
+                  minute: g.minute, type: g.type,
+                  team:   { name: g.team?.name },
+                  scorer: { name: g.scorer?.name },
+                  assist: g.assist ? { name: g.assist?.name } : null
+                }))
+              }));
+            } catch(e) { console.log('No match details:', e.message); }
+
+            const out = { updated: new Date().toISOString(), matches, standings, scorers, articles, matchDetails };
             fs.writeFileSync('data.json', JSON.stringify(out));
-            console.log('OK:', matches.length, 'matches,', articles.length, 'articles');
+            console.log('Written:', matches.length, 'matches,', matchDetails.length, 'details,', articles.length, 'articles');
 
       - name: Commit
         run: |

@@ -171,6 +171,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14
     <button class="ntab" data-tab="venues">📍 Venues</button>
     <button class="ntab" data-tab="news">📰 News</button>
     <button class="ntab" data-tab="boot">⚽ Golden Boot</button>
+    <button class="ntab" data-tab="results">📋 Results</button>
   </div>
 </header>
 
@@ -328,10 +329,14 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14
         <div style="background:var(--bg3);border-radius:8px;padding:12px;text-align:center"><div style="font-size:26px;font-weight:700;color:var(--blue)" id="stat-goals">—</div><div style="font-size:10px;color:var(--text3);margin-top:2px">Total goals</div></div>
         <div style="background:var(--bg3);border-radius:8px;padding:12px;text-align:center"><div style="font-size:26px;font-weight:700;color:var(--green)" id="stat-avg">—</div><div style="font-size:10px;color:var(--text3);margin-top:2px">Goals per game</div></div>
         <div style="background:var(--bg3);border-radius:8px;padding:12px;text-align:center"><div style="font-size:26px;font-weight:700;color:var(--yellow)" id="stat-played">—</div><div style="font-size:10px;color:var(--text3);margin-top:2px">Matches played</div></div>
-        <div style="background:var(--bg3);border-radius:8px;padding:12px;text-align:center"><div style="font-size:26px;font-weight:700;color:var(--red)">3</div><div style="font-size:10px;color:var(--text3);margin-top:2px">Hat tricks</div></div>
+
       </div>
     </div>
   </div>
+</div>
+
+<div class="tab-section" id="tab-results">
+  <div id="results-body"><div class="spin-wrap"><div class="spinner"></div>Loading match summaries…</div></div>
 </div>
 
 </main>
@@ -726,6 +731,80 @@ function renderOdds(matches, standings) {
   }).join('');
 }
 
+
+// ── Render match results ──────────────────────────────────────
+function renderResults(matchDetails, matches) {
+  const el = document.getElementById('results-body');
+  if (!el) return;
+
+  // If no match details yet, fall back to last 5 finished matches without goal detail
+  let details = matchDetails || [];
+  if (!details.length) {
+    const finished = (matches || [])
+      .filter(m => m.status === 'FINISHED')
+      .sort((a, b) => new Date(b.utcDate) - new Date(a.utcDate))
+      .slice(0, 5);
+    if (!finished.length) { el.innerHTML = '<div class="empty">No completed matches yet</div>'; return; }
+    details = finished.map(m => ({ ...m, goals: [] }));
+  }
+
+  // Count goals per player per match for hat trick detection
+  function getHatTricks(goals) {
+    const counts = {};
+    (goals || []).forEach(g => {
+      if (g.type === 'OWN_GOAL') return;
+      const name = g.scorer?.name;
+      if (name) counts[name] = (counts[name] || 0) + 1;
+    });
+    return Object.entries(counts).filter(([, c]) => c >= 3).map(([n]) => n);
+  }
+
+  // Update hat trick stat
+  let totalHatTricks = 0;
+  details.forEach(m => {
+    totalHatTricks += getHatTricks(m.goals).length;
+  });
+  const shEl = document.getElementById('stat-hattricks-val');
+  if (shEl) shEl.textContent = totalHatTricks;
+
+  el.innerHTML = details.map(m => {
+    const sc = m.score?.fullTime;
+    const scoreStr = sc && sc.home !== null ? sc.home + ' – ' + sc.away : '—';
+    const hatTrickPlayers = getHatTricks(m.goals);
+    const dateStr = new Date(m.utcDate).toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric'});
+    const homeTag = '<span class="ms-team-tag ms-home-tag">' + (m.homeTeam?.tla || 'H') + '</span>';
+    const awayTag = '<span class="ms-team-tag ms-away-tag">' + (m.awayTeam?.tla || 'A') + '</span>';
+
+    const goalsHtml = (m.goals || []).length
+      ? m.goals.map(g => {
+          const isOG  = g.type === 'OWN_GOAL';
+          const isPen = g.type === 'PENALTY';
+          const isHome = g.team?.name === m.homeTeam?.name;
+          const ball  = isOG ? '🔴' : '⚽';
+          const tag   = isHome ? homeTag : awayTag;
+          const scorerCls = isOG ? ' ms-og' : '';
+          const penLabel  = isPen ? ' <span class="ms-pen">(P)</span>' : '';
+          const htLabel   = hatTrickPlayers.includes(g.scorer?.name) ? '<span class="ms-hattrick">🎩</span>' : '';
+          const assistHtml = g.assist?.name ? '<div class="ms-assist">Assist: ' + g.assist.name + '</div>' : '';
+          return '<div class="ms-goal">' +
+            '<span class="ms-min">' + g.minute + "'</span>" +
+            '<span class="ms-ball">' + ball + '</span>' +
+            '<div style="flex:1"><div class="ms-scorer' + scorerCls + '">' + (g.scorer?.name || 'Unknown') + penLabel + htLabel + '</div>' + assistHtml + '</div>' +
+            tag + '</div>';
+        }).join('')
+      : '<div class="ms-no-goals">Goal detail not available</div>';
+
+    return '<div class="ms-card">' +
+      '<div class="ms-header">' +
+        '<div><div class="ms-teams">' + m.homeTeam?.name + ' vs ' + m.awayTeam?.name + '</div>' +
+        '<div class="ms-meta">' + dateStr + ' · ' + (m.group || m.stage || '') + '</div></div>' +
+        '<div class="ms-score">' + scoreStr + '</div>' +
+      '</div>' +
+      '<div class="ms-goals">' + goalsHtml + '</div>' +
+    '</div>';
+  }).join('');
+}
+
 // ── Load data.json ────────────────────────────────────────────
 async function loadAll() {
   try {
@@ -752,6 +831,7 @@ async function loadAll() {
     renderScorers(scorers);
     renderNews(articles);
     renderOdds(matches, standings);
+    renderResults(d.matchDetails, matches);
 
     const played = matches.filter(m=>m.status==='FINISHED').length;
     const goals  = matches.filter(m=>m.status==='FINISHED').reduce((s,m)=>s+(m.score?.fullTime?.home||0)+(m.score?.fullTime?.away||0),0);
@@ -759,6 +839,7 @@ async function loadAll() {
     if(sp) sp.textContent=played;
     if(sg) sg.textContent=goals;
     if(sa) sa.textContent=played?(goals/played).toFixed(1):'—';
+
 
   } catch(e) {
     console.error(e);
