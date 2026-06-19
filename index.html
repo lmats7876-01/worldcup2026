@@ -921,18 +921,22 @@ let cachedStandings = [];
 
 
 function renderNews(articles) {
-  if (!articles.length) return;
+  if (!articles || !articles.length) {
+    const msg = '<div class="empty-state" style="padding:20px;text-align:center;color:var(--text3);font-size:12px">No news articles available yet — GitHub Action will update shortly</div>';
+    ['today-news-body','news-tab-body'].forEach(id => { const el = document.getElementById(id); if(el) el.innerHTML = msg; });
+    return;
+  }
 
   ['news-badge','news-tab-badge'].forEach(id => { const el = document.getElementById(id); if(el) el.textContent = articles.length + ' articles'; });
 
   const html = articles.map(a => {
-    const src  = a.source?.name || 'News';
+    const src  = a.source?.name || a.source || 'News';
     const agoMs = Date.now() - new Date(a.publishedAt).getTime();
     const agoMin = Math.floor(agoMs / 60000);
     const ago = agoMin < 60 ? agoMin + 'm ago'
       : agoMin < 1440 ? Math.floor(agoMin/60) + 'h ago'
       : Math.floor(agoMin/1440) + 'd ago';
-    const img  = a.image || a.urlToImage
+    const img  = a.image || a.urlToImage || a.thumbnail
       ? `<img src="${a.urlToImage}" style="width:44px;height:44px;border-radius:var(--radius-sm);object-fit:cover;flex-shrink:0" onerror="this.style.display='none'">`
       : `<div style="width:44px;height:44px;border-radius:var(--radius-sm);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">⚽</div>`;
     return `<a class="news-row" href="${a.url}" target="_blank" rel="noopener">
