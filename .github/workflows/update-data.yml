@@ -14,17 +14,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Fetch data
+      - name: Fetch scores and standings
         env:
           FOOTBALL_KEY: ${{ secrets.FOOTBALL_API_KEY }}
-          NEWS_KEY: ${{ secrets.NEWS_API_KEY }}
         run: |
           curl -s -H "X-Auth-Token: $FOOTBALL_KEY" "https://api.football-data.org/v4/competitions/WC/matches" -o matches_raw.json
           curl -s -H "X-Auth-Token: $FOOTBALL_KEY" "https://api.football-data.org/v4/competitions/WC/standings" -o standings_raw.json
           curl -s -H "X-Auth-Token: $FOOTBALL_KEY" "https://api.football-data.org/v4/competitions/WC/scorers?limit=15" -o scorers_raw.json
-          curl -s "https://gnews.io/api/v4/search?q=%22World+Cup+2026%22&lang=en&max=12&sortby=publishedAt&token=$NEWS_KEY" -o news_raw.json
 
-      - name: Build index.html with embedded data
+      - name: Build data.json (preserve existing news)
         uses: actions/github-script@v7
         with:
           script: |
@@ -33,77 +31,48 @@ jobs:
             const raw_m  = JSON.parse(fs.readFileSync('matches_raw.json',   'utf8'));
             const raw_st = JSON.parse(fs.readFileSync('standings_raw.json', 'utf8'));
             const raw_sc = JSON.parse(fs.readFileSync('scorers_raw.json',   'utf8'));
-            const raw_n  = JSON.parse(fs.readFileSync('news_raw.json',      'utf8'));
+
+            // Preserve existing articles from data.json if present
+            let articles = [];
+            try {
+              const existing = JSON.parse(fs.readFileSync('data.json', 'utf8'));
+              articles = existing.articles || [];
+            } catch(e) { articles = []; }
 
             const matches = (raw_m.matches || []).map(m => ({
-              utcDate:  m.utcDate,
-              status:   m.status,
-              group:    m.group,
-              stage:    m.stage,
+              utcDate:  m.utcDate, status: m.status, group: m.group, stage: m.stage,
               homeTeam: { name: m.homeTeam.name, shortName: m.homeTeam.shortName, tla: m.homeTeam.tla },
               awayTeam: { name: m.awayTeam.name, shortName: m.awayTeam.shortName, tla: m.awayTeam.tla },
-              score:    m.score
+              score: m.score
             }));
 
             const standings = (raw_st.standings || [])
               .filter(s => s.type === 'TOTAL')
               .map(s => ({
-                group: s.group,
-                type:  s.type,
+                group: s.group, type: s.type,
                 table: s.table.map(t => ({
-                  position:    t.position,
-                  points:      t.points,
-                  playedGames: t.playedGames,
-                  won:         t.won,
-                  draw:        t.draw,
-                  lost:        t.lost,
+                  position: t.position, points: t.points, playedGames: t.playedGames,
+                  won: t.won, draw: t.draw, lost: t.lost,
                   team: { name: t.team.name, shortName: t.team.shortName, tla: t.team.tla }
                 }))
               }));
 
             const scorers = (raw_sc.scorers || []).map(s => ({
-              goals:  s.goals,
+              goals: s.goals,
               player: { name: s.player.name },
-              team:   { name: s.team.name, shortName: s.team.shortName }
+              team: { name: s.team.name, shortName: s.team.shortName }
             }));
 
-            const articles = (raw_n.articles || []).map(a => ({
-              title:       a.title,
-              url:         a.url,
-              image:       a.image,
-              publishedAt: a.publishedAt,
-              source:      a.source?.name || a.source || ''
-            }));
-
-            const data = {
-              updated:   new Date().toISOString(),
-              matches,
-              standings,
-              scorers,
-              articles
-            };
-
-            // Use JSON.stringify then encode as base64 to avoid any quote/escape issues in HTML
-            const json = JSON.stringify(data);
-            const b64  = Buffer.from(json).toString('base64');
-
-            let html = fs.readFileSync('index.template.html', 'utf8');
-            // Inject as base64 — 100% safe, no quote issues
-            html = html.replace(
-              '/*SNAPSHOT_PLACEHOLDER*/',
-              `window.WC_SNAPSHOT = JSON.parse(atob("${b64}"));`
-            );
-            fs.writeFileSync('index.html', html);
-            fs.writeFileSync('data.json', json);
-
-            console.log('Built index.html:', Math.round(json.length/1024) + 'KB,', matches.length, 'matches,', articles.length, 'articles');
+            const out = { updated: new Date().toISOString(), matches, standings, scorers, articles };
+            fs.writeFileSync('data.json', JSON.stringify(out));
+            console.log('Written:', matches.length, 'matches,', articles.length, 'articles (preserved)');
 
       - name: Commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add index.html data.json
+          git add data.json
           git diff --staged --quiet && echo "No changes" && exit 0
-          git commit -m "data: update $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git commit -m "scores: update $(date -u +%Y-%m-%dT%H:%M:%SZ)"
           git pull --rebase origin main
           git push
