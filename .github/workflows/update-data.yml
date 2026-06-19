@@ -25,6 +25,41 @@ jobs:
       - name: Pull latest data.json
         run: git pull origin main
 
+      - name: Fetch last 5 match details
+        env:
+          FOOTBALL_KEY: ${{ secrets.FOOTBALL_API_KEY }}
+        run: |
+          # Get IDs of last 5 finished matches from matches_raw.json
+          python3 << 'PYEOF'
+import json, subprocess
+
+with open('matches_raw.json') as f:
+    data = json.load(f)
+
+finished = [m for m in data.get('matches', []) if m['status'] == 'FINISHED']
+last5 = sorted(finished, key=lambda m: m['utcDate'], reverse=True)[:5]
+
+details = []
+for m in last5:
+    mid = m['id']
+    result = subprocess.run(
+        ['curl', '-s', '-H', f'X-Auth-Token: ${{ secrets.FOOTBALL_API_KEY }}',
+         f'https://api.football-data.org/v4/matches/{mid}'],
+        capture_output=True, text=True
+    )
+    try:
+        detail = json.loads(result.stdout)
+        details.append(detail)
+        print(f"Fetched match {mid}: {m['homeTeam']['name']} vs {m['awayTeam']['name']}")
+    except Exception as e:
+        print(f"Failed match {mid}: {e}")
+
+with open('match_details.json', 'w') as f:
+    json.dump(details, f)
+
+print(f'Saved {len(details)} match details')
+PYEOF
+
       - name: Build data.json
         uses: actions/github-script@v7
         with:
@@ -58,14 +93,36 @@ jobs:
               team: { name: s.team.name, shortName: s.team.shortName }
             }));
 
-            // Read existing articles if available, otherwise empty
+            // Read existing articles
             let articles = [];
             try {
               const d = JSON.parse(fs.readFileSync('data.json', 'utf8'));
               articles = Array.isArray(d.articles) ? d.articles : [];
             } catch(e) {}
 
-            const out = { updated: new Date().toISOString(), matches, standings, scorers, articles };
+            // Read match details
+            let matchDetails = [];
+            try {
+              const raw = JSON.parse(fs.readFileSync('match_details.json', 'utf8'));
+              matchDetails = raw.map(m => ({
+                id:       m.id,
+                utcDate:  m.utcDate,
+                status:   m.status,
+                group:    m.group,
+                homeTeam: { name: m.homeTeam?.name, shortName: m.homeTeam?.shortName, tla: m.homeTeam?.tla },
+                awayTeam: { name: m.awayTeam?.name, shortName: m.awayTeam?.shortName, tla: m.awayTeam?.tla },
+                score:    m.score,
+                goals:    (m.goals || []).map(g => ({
+                  minute:  g.minute,
+                  type:    g.type,
+                  team:    { name: g.team?.name },
+                  scorer:  { name: g.scorer?.name },
+                  assist:  g.assist ? { name: g.assist?.name } : null
+                }))
+              }));
+            } catch(e) { console.log('No match details:', e.message); }
+
+            const out = { updated: new Date().toISOString(), matches, standings, scorers, articles, matchDetails };
             fs.writeFileSync('data.json', JSON.stringify(out));
             console.log('OK:', matches.length, 'matches,', articles.length, 'articles');
 
