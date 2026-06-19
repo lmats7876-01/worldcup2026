@@ -240,14 +240,11 @@ const CONFIG = {
     </div>
     <div class="col">
       <div class="panel">
-        <div class="ph"><div class="ph-title">📰 Latest news</div></div>
-        <a class="news-row" href="https://www.espn.com/soccer/story/_/id/48939282/2026-fifa-world-cup-fixtures-results-match-schedule-group-stage-knockout-rounds-bracket" target="_blank" rel="noopener"><div class="news-flag">🇦🇷</div><div><div class="news-hl">Messi hat trick ties Klose's all-time World Cup record — 16 goals in Argentina 3–0 Algeria</div><div class="news-meta"><span class="news-src">ESPN</span><span>· 1d ago</span></div></div></a>
-        <a class="news-row" href="https://sports.yahoo.com/soccer/article/2026-world-cup-results-and-schedule-live-scores-group-stage-updates-and-how-to-watch-050724193.html" target="_blank" rel="noopener"><div class="news-flag">🏴󠁧󠁢󠁥󠁮󠁧󠁿</div><div><div class="news-hl">Kane double powers England past Croatia 4–2 — Bellingham stars in Dallas</div><div class="news-meta"><span class="news-src">Yahoo Sports</span><span>· 12h ago</span></div></div></a>
-        <a class="news-row" href="https://bleacherreport.com/articles/25441482-world-cup-2026-group-standings-schedule-after-tuesdays-results-ahead-ko-bracket" target="_blank" rel="noopener"><div class="news-flag">🇪🇸</div><div><div class="news-hl">Spain held to 0–0 shock by Cape Verde — Vozinha gains 2M followers overnight</div><div class="news-meta"><span class="news-src">Bleacher Report</span><span>· 3d ago</span></div></div></a>
-        <a class="news-row" href="https://sports.yahoo.com/soccer/article/2026-world-cup-results-and-schedule-live-scores-group-stage-updates-and-how-to-watch-050724193.html" target="_blank" rel="noopener"><div class="news-flag">🇺🇸</div><div><div class="news-hl">USA 4–1 Paraguay: Balogun and Pulisic star in dominant USMNT opener</div><div class="news-meta"><span class="news-src">Yahoo Sports</span><span>· 6d ago</span></div></div></a>
-        <a class="news-row" href="https://www.fourfourtwo.com/competition/all-of-the-world-cup-scores-so-far-at-the-2026-tournament" target="_blank" rel="noopener"><div class="news-flag">🇳🇴</div><div><div class="news-hl">Haaland finally scores World Cup goal as Norway beat Iraq 4–1</div><div class="news-meta"><span class="news-src">FourFourTwo</span><span>· 6d ago</span></div></div></a>
-        <a class="news-row" href="https://www.fourfourtwo.com/competition/all-of-the-world-cup-scores-so-far-at-the-2026-tournament" target="_blank" rel="noopener"><div class="news-flag">🇩🇪</div><div><div class="news-hl">Germany 4–0 Saudi Arabia: Ruthless display signals Die Mannschaft are back</div><div class="news-meta"><span class="news-src">FourFourTwo</span><span>· 4d ago</span></div></div></a>
-        <a class="news-row" href="https://sports.yahoo.com/soccer/article/2026-world-cup-results-and-schedule-live-scores-group-stage-updates-and-how-to-watch-050724193.html" target="_blank" rel="noopener"><div class="news-flag">🇧🇷</div><div><div class="news-hl">Brazil held 1–1 by Morocco — Vinícius Jr bails out Seleção</div><div class="news-meta"><span class="news-src">Yahoo Sports</span><span>· 5d ago</span></div></div></a>
+        <div class="ph">
+          <div class="ph-title">📰 Latest news</div>
+          <span class="ph-badge badge-blue" id="news-badge">Live</span>
+        </div>
+        <div id="today-news-body"><div class="loading-msg"><div class="spinner-wrap"><div class="spinner"></div>Loading news…</div></div></div>
       </div>
     </div>
   </div>
@@ -577,7 +574,7 @@ function matchCard(m, standings) {
     <div class="match-time ${timeClass}">${timeLabel}</div>
     <div class="match-teams">
       <div class="match-team">${m.homeTeam.name} vs ${m.awayTeam.name}</div>
-      <div class="match-venue">${m.group||''}</div>
+      <div class="match-venue">${m.venue ? '🏟 ' + m.venue + (m.group ? ' · ' + m.group : '') : m.group||''}</div>
     </div>
     ${scoreHtml}
   </a>`;
