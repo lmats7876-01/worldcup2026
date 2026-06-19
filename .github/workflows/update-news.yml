@@ -1,0 +1,52 @@
+name: Update World Cup News
+
+on:
+  schedule:
+    - cron: '0 * * * *'   # once per hour
+  workflow_dispatch:
+
+jobs:
+  news:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch news
+        env:
+          NEWS_KEY: ${{ secrets.NEWS_API_KEY }}
+        run: |
+          curl -s "https://gnews.io/api/v4/search?q=%22World+Cup+2026%22+OR+%22FIFA+2026%22&lang=en&max=12&sortby=publishedAt&token=$NEWS_KEY" -o news_raw.json
+          cat news_raw.json
+
+      - name: Inject news into data.json
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const raw = JSON.parse(fs.readFileSync('news_raw.json', 'utf8'));
+            const articles = (raw.articles || []).map(a => ({
+              title: a.title, url: a.url, image: a.image,
+              publishedAt: a.publishedAt,
+              source: a.source?.name || a.source || ''
+            }));
+            console.log('Fetched', articles.length, 'articles');
+            if (!articles.length) { console.log('No articles — skipping update'); return; }
+
+            const existing = JSON.parse(fs.readFileSync('data.json', 'utf8'));
+            existing.articles = articles;
+            existing.newsUpdated = new Date().toISOString();
+            fs.writeFileSync('data.json', JSON.stringify(existing));
+            console.log('News updated in data.json');
+
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data.json
+          git diff --staged --quiet && echo "No changes" && exit 0
+          git commit -m "news: update $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git pull --rebase origin main
+          git push
